@@ -15,6 +15,8 @@ import GhostWallPage from './pages/GhostWallPage';
 import FriendsPage  from './pages/FriendsPage';
 import CapsuleViewPage from './pages/CapsuleViewPage';
 import ProfilePage  from './pages/ProfilePage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage  from './pages/ResetPasswordPage';
 
 const AppLayout = ({ children }) => (
   <>
@@ -46,8 +48,10 @@ function App() {
         />
         <Routes>
           {/* Public */}
-          <Route path="/login"    element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login"             element={<LoginPage />} />
+          <Route path="/register"          element={<RegisterPage />} />
+          <Route path="/forgot-password"   element={<ForgotPasswordPage />} />
+          <Route path="/reset-password"    element={<ResetPasswordPage />} />
 
           {/* Protected */}
           <Route path="/vault" element={

@@ -8,6 +8,11 @@ const REQUIRED_ENV = [
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
+  'SMTP_HOST',
+  'SMTP_PORT',
+  'SMTP_USER',
+  'SMTP_PASS',
+  'SMTP_FROM',
 ];
 const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missing.length) {

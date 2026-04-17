@@ -14,6 +14,11 @@ const ProfilePage = () => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Change Password state
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [pwdForm, setPwdForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [pwdLoading, setPwdLoading] = useState(false);
 
   const onDrop = useCallback((accepted) => {
     if (accepted.length > 0) {
@@ -42,6 +47,34 @@ const ProfilePage = () => {
       toast.error(err.response?.data?.message || 'Could not update profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!pwdForm.currentPassword || !pwdForm.newPassword || !pwdForm.confirmPassword) {
+      return toast.error('Please fill in all password fields');
+    }
+    if (pwdForm.newPassword !== pwdForm.confirmPassword) {
+      return toast.error('New passwords do not match');
+    }
+    if (pwdForm.newPassword.length < 6) {
+      return toast.error('New password must be at least 6 characters');
+    }
+
+    setPwdLoading(true);
+    try {
+      await api.post('/auth/change-password', {
+        currentPassword: pwdForm.currentPassword,
+        newPassword: pwdForm.newPassword,
+      });
+      toast.success('Password updated successfully ✨');
+      setPwdForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordSection(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not update password');
+    } finally {
+      setPwdLoading(false);
     }
   };
 
@@ -111,6 +144,67 @@ const ProfilePage = () => {
           <button className="btn btn-primary w-full" onClick={handleSave} disabled={loading}>
             {loading ? <><span className="spinner" /> Saving…</> : 'Save Changes'}
           </button>
+
+          <div className="divider" style={{ margin: 'var(--space-8) 0' }} />
+
+          {/* Change Password Collapsible */}
+          <div>
+            <button 
+              className="btn btn-secondary w-full" 
+              style={{ 
+                background: 'var(--color-parchment)', 
+                color: 'var(--color-text-primary)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+              onClick={() => setShowPasswordSection(!showPasswordSection)}
+            >
+              <span>{showPasswordSection ? '🔒 Hide Password Settings' : '🔑 Change Password'}</span>
+              <span>{showPasswordSection ? '−' : '+'}</span>
+            </button>
+
+            {showPasswordSection && (
+              <div style={{ marginTop: 'var(--space-6)', padding: 'var(--space-4)', border: '1px dashed var(--color-sand)', borderRadius: 'var(--radius-md)' }}>
+                <div className="form-group">
+                  <label className="form-label">Current Password</label>
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    value={pwdForm.currentPassword} 
+                    onChange={e => setPwdForm({...pwdForm, currentPassword: e.target.value})} 
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">New Password</label>
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    placeholder="Min. 6 characters"
+                    value={pwdForm.newPassword} 
+                    onChange={e => setPwdForm({...pwdForm, newPassword: e.target.value})} 
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Confirm New Password</label>
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    value={pwdForm.confirmPassword} 
+                    onChange={e => setPwdForm({...pwdForm, confirmPassword: e.target.value})} 
+                  />
+                </div>
+                <button 
+                  className="btn btn-primary w-full" 
+                  onClick={handleChangePassword} 
+                  disabled={pwdLoading}
+                  style={{ background: 'var(--gradient-amber)' }}
+                >
+                  {pwdLoading ? <><span className="spinner" /> Updating…</> : 'Update Password'}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
