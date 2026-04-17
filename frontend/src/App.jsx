@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 
@@ -28,7 +29,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Toaster
+        <SocketProvider>
+          <Toaster
           position="top-right"
           toastOptions={{
             duration: 3500,
@@ -88,6 +90,7 @@ function App() {
           <Route path="/" element={<Navigate to="/vault" replace />} />
           <Route path="*" element={<Navigate to="/vault" replace />} />
         </Routes>
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
   );

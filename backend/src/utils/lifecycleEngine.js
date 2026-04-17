@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const Capsule = require('../models/Capsule');
 const GhostWallPost = require('../models/GhostWallPost');
 const cloudinary = require('../config/cloudinary');
+const { getIo } = require('../config/socket');
 
 /**
  * Delete media from Cloudinary by public_id
@@ -30,15 +31,26 @@ const getResourceType = (publicId = '') => {
  */
 const unlockDueCapsules = async () => {
   const now = new Date();
-  const result = await Capsule.updateMany(
-    {
-      status: 'LOCKED',
-      'rules.unlockAt': { $ne: null, $lte: now },
-    },
-    { $set: { status: 'UNLOCKED' } }
-  );
-  if (result.modifiedCount > 0) {
-    console.log(`[Lifecycle] Unlocked ${result.modifiedCount} capsule(s)`);
+  const capsulesToUnlock = await Capsule.find({
+    status: 'LOCKED',
+    'rules.unlockAt': { $ne: null, $lte: now },
+  });
+
+  for (const capsule of capsulesToUnlock) {
+    capsule.status = 'UNLOCKED';
+    await capsule.save();
+
+    const io = getIo();
+    if (io) {
+      io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
+      }
+    }
+  }
+
+  if (capsulesToUnlock.length > 0) {
+    console.log(`[Lifecycle] Unlocked ${capsulesToUnlock.length} capsule(s)`);
   }
 };
 
@@ -60,6 +72,14 @@ const expireDueCapsules = async () => {
     capsule.mediaUrl = '';
     capsule.mediaPublicId = '';
     await capsule.save();
+
+    const io = getIo();
+    if (io) {
+      io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'EXPIRED' });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'EXPIRED' });
+      }
+    }
   }
 
   if (capsulesToExpire.length > 0) {
@@ -68,7 +88,39 @@ const expireDueCapsules = async () => {
 };
 
 /**
- * TASK 3: Expire Ghost Wall posts whose expiresAt has passed
+ * TASK 3: Process pending capsule destructions
+ */
+const processPendingDestructions = async () => {
+  const now = new Date();
+  const capsulesToDestroy = await Capsule.find({
+    status: { $in: ['LOCKED', 'UNLOCKED'] },
+    destroyAt: { $ne: null, $lte: now },
+  });
+
+  for (const capsule of capsulesToDestroy) {
+    try {
+      if (capsule.mediaPublicId) {
+        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
+      }
+      capsule.status = 'DESTROYED';
+      capsule.mediaUrl = '';
+      capsule.mediaPublicId = '';
+      capsule.textContent = '';
+      capsule.destroyAt = null; // clear the pending destruction
+      await capsule.save();
+      console.log(`[Lifecycle] Destroyed capsule ${capsule._id} after scheduled time`);
+    } catch (err) {
+      console.error(`[Lifecycle] Error destroying capsule ${capsule._id}:`, err.message);
+    }
+  }
+
+  if (capsulesToDestroy.length > 0) {
+    console.log(`[Lifecycle] Processed ${capsulesToDestroy.length} pending destructions`);
+  }
+};
+
+/**
+ * TASK 4: Expire Ghost Wall posts whose expiresAt has passed
  */
 const expireGhostWallPosts = async () => {
   const now = new Date();
@@ -97,11 +149,41 @@ const expireGhostWallPosts = async () => {
  */
 const startLifecycleEngine = () => {
   console.log('[Lifecycle] Engine started — running every minute');
+  
+  // also handle "destroyAt" capsules
+  const checkDestroyAt = async () => {
+    const now = new Date();
+    const capsulesToDestroy = await Capsule.find({
+      status: { $in: ['LOCKED', 'UNLOCKED'] },
+      destroyAt: { $ne: null, $lte: now } // I added this earlier to avoid destroying before response, so cron cleans it
+    });
+
+    for (const capsule of capsulesToDestroy) {
+      if (capsule.mediaPublicId) {
+        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
+      }
+      capsule.status = 'DESTROYED';
+      capsule.mediaUrl = '';
+      capsule.mediaPublicId = '';
+      capsule.textContent = '';
+      await capsule.save();
+
+      const io = getIo();
+      if (io) {
+        io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DESTROYED' });
+        if (capsule.recipient) {
+          io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DESTROYED' });
+        }
+      }
+    }
+  };
 
   cron.schedule('* * * * *', async () => {
     try {
+      await checkDestroyAt();
       await unlockDueCapsules();
       await expireDueCapsules();
+      await processPendingDestructions();
       await expireGhostWallPosts();
     } catch (err) {
       console.error('[Lifecycle] Error during cron run:', err.message);

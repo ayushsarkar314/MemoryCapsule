@@ -43,6 +43,7 @@ const capsuleSchema = new mongoose.Schema(
       unlockAt: { type: Date, default: null },       // Unlock at a future date
       destroyAfterView: { type: Boolean, default: false }, // Destroy after single view
       expireAt: { type: Date, default: null },        // Auto-expire at a date
+      eventName: { type: String, default: null },     // Event-based trigger (e.g. "GRADUATION")
     },
     // For shared capsules: recipient user
     recipient: {
@@ -59,6 +60,11 @@ const capsuleSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Pending destruction (for destroy-after-view capsules)
+    destroyAt: {
+      type: Date,
+      default: null,
+    },
     // Is this a personal capsule or shared capsule?
     capsuleType: {
       type: String,
@@ -72,5 +78,6 @@ const capsuleSchema = new mongoose.Schema(
 // Index for efficient lifecycle queries
 capsuleSchema.index({ status: 1, 'rules.unlockAt': 1 });
 capsuleSchema.index({ status: 1, 'rules.expireAt': 1 });
+capsuleSchema.index({ status: 1, destroyAt: 1 });
 
 module.exports = mongoose.model('Capsule', capsuleSchema);

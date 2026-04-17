@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import CapsuleCard from '../components/CapsuleCard';
+import { useSocket } from '../context/SocketContext';
 
 const TABS = [
   { key: 'unlocked',  label: 'Unlocked',  icon: '🔓', color: 'var(--color-unlocked)' },
@@ -28,7 +29,41 @@ const VaultPage = () => {
     }
   };
 
+  const fireTriggerEvent = async () => {
+    const eventName = window.prompt("Enter the Event Name to trigger (e.g. GRADUATION):");
+    if (!eventName) return;
+    
+    try {
+      const res = await api.post(`/capsules/trigger/${eventName.toUpperCase()}`);
+      toast.success(res.data.message);
+      fetchVault();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not trigger event');
+    }
+  };
+
   useEffect(() => { fetchVault(); }, []);
+
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+    
+    const handleStatusChanged = (data) => {
+      if (data.event) {
+        toast.success(`Event '${data.event}' unlocked ${data.count} capsules!`);
+      } else if (data.status) {
+        toast(`A capsule status changed to ${data.status}`, { icon: '🔔' });
+      }
+      fetchVault();
+    };
+
+    socket.on('capsule_status_changed', handleStatusChanged);
+
+    return () => {
+      socket.off('capsule_status_changed', handleStatusChanged);
+    };
+  }, [socket]);
 
   const activeCapsules = vault[activeTab] || [];
 
@@ -39,9 +74,14 @@ const VaultPage = () => {
         <p className="section-eyebrow">Personal</p>
         <div className="section-header">
           <h2>My Vault</h2>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
-            ✨ New Capsule
-          </button>
+          <div style={{ display: 'flex', gap: 'var(--space-3)'}}>
+            <button className="btn btn-sm" style={{ background: 'var(--color-sand)', color: 'var(--color-text-primary)' }} onClick={fireTriggerEvent}>
+              🎉 Trigger Event
+            </button>
+            <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
+              ✨ New Capsule
+            </button>
+          </div>
         </div>
 
         {/* Stats row */}

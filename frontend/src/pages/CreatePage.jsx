@@ -31,6 +31,12 @@ const RULES = [
     title: 'Auto-expire on a date',
     desc: 'Content disappears on schedule.',
   },
+  {
+    key: 'eventName',
+    icon: '🎉',
+    title: 'Unlock on an Event',
+    desc: 'Capsule stays sealed until a specific event is triggered.',
+  },
 ];
 
 const CreatePage = () => {
@@ -205,6 +211,13 @@ const CreatePage = () => {
                 <div className="form-group">
                   <label className="form-label">Expiry Date & Time</label>
                   <input type="datetime-local" className="form-input" min={minDate} value={ruleValue} onChange={e => setRuleValue(e.target.value)} />
+                </div>
+              )}
+
+              {ruleType === 'eventName' && (
+                <div className="form-group">
+                  <label className="form-label">Event Name</label>
+                  <input type="text" className="form-input" placeholder="e.g. GRADUATION" value={ruleValue} onChange={e => setRuleValue(e.target.value.toUpperCase())} />
                 </div>
               )}
 

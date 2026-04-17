@@ -1,6 +1,7 @@
 const Capsule = require('../models/Capsule');
 const cloudinary = require('../config/cloudinary');
 const { deleteFromCloudinary, getResourceType } = require('../utils/lifecycleEngine');
+const { getIo } = require('../config/socket');
 
 // @desc    Create a new capsule
 // @route   POST /api/capsules
@@ -14,7 +15,7 @@ const createCapsule = async (req, res) => {
     }
 
     // Validate rule
-    if (!ruleType || !['unlockAt', 'destroyAfterView', 'expireAt'].includes(ruleType)) {
+    if (!ruleType || !['unlockAt', 'destroyAfterView', 'expireAt', 'eventName'].includes(ruleType)) {
       return res.status(400).json({ message: 'A valid rule type is required' });
     }
 
@@ -23,6 +24,7 @@ const createCapsule = async (req, res) => {
       unlockAt: null,
       destroyAfterView: false,
       expireAt: null,
+      eventName: null,
     };
 
     if (ruleType === 'unlockAt') {
@@ -33,6 +35,9 @@ const createCapsule = async (req, res) => {
     } else if (ruleType === 'expireAt') {
       if (!ruleValue) return res.status(400).json({ message: 'Expiry date is required' });
       rules.expireAt = new Date(ruleValue);
+    } else if (ruleType === 'eventName') {
+      if (!ruleValue) return res.status(400).json({ message: 'Event name is required' });
+      rules.eventName = ruleValue;
     }
 
     // Handle media
@@ -166,39 +171,29 @@ const viewCapsule = async (req, res) => {
       // Mark as seen first, then schedule destruction
       capsule.seenByRecipient = true;
       capsule.seenAt = new Date();
+      capsule.destroyAt = new Date(Date.now() + 30000); // Destroy in 30 seconds
       await capsule.save();
 
       const responseData = { capsule };
 
-      // Destroy after sending response
+      // Send response immediately
       res.status(200).json(responseData);
 
-      // Clean up after response
-      if (capsule.mediaPublicId) {
-        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
-      }
-      capsule.status = 'DESTROYED';
-      capsule.mediaUrl = '';
-      capsule.mediaPublicId = '';
-      capsule.textContent = ''; // wipe text too
-      await capsule.save();
+      console.log(`[Capsule] Scheduled destruction for capsule ${capsule._id} at ${capsule.destroyAt} (in ${(capsule.destroyAt - Date.now()) / 1000} seconds)`);
 
       return;
     }
 
     // For personal destroy-after-view capsules: destroy on view
     if (capsule.rules.destroyAfterView && isCreator && capsule.capsuleType === 'personal') {
+      capsule.destroyAt = new Date(Date.now() + 30000); // Destroy in 30 seconds
+      await capsule.save();
+
       const responseData = { capsule };
       res.status(200).json(responseData);
 
-      if (capsule.mediaPublicId) {
-        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
-      }
-      capsule.status = 'DESTROYED';
-      capsule.mediaUrl = '';
-      capsule.mediaPublicId = '';
-      capsule.textContent = '';
-      await capsule.save();
+      console.log(`[Capsule] Scheduled destruction for personal capsule ${capsule._id} at ${capsule.destroyAt} (in ${(capsule.destroyAt - Date.now()) / 1000} seconds)`);
+
       return;
     }
 
@@ -233,10 +228,54 @@ const deleteCapsule = async (req, res) => {
     }
 
     await capsule.deleteOne();
+    
+    // Emit event
+    const io = getIo();
+    if (io) {
+      io.to(req.user._id.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DELETED' });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DELETED' });
+      }
+    }
+
     res.status(200).json({ message: 'Capsule deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule };
+// @desc    Trigger an event to unlock event-based capsules
+// @route   POST /api/capsules/trigger/:eventName
+// @access  Private
+const triggerEvent = async (req, res) => {
+  try {
+    const { eventName } = req.params;
+    if (!eventName) return res.status(400).json({ message: 'Event name is required' });
+
+    const capsulesToUnlock = await Capsule.find({
+      status: 'LOCKED',
+      creator: req.user._id,
+      'rules.eventName': eventName,
+    });
+
+    for (const capsule of capsulesToUnlock) {
+      capsule.status = 'UNLOCKED';
+      await capsule.save();
+      
+      const io = getIo();
+      if (io) {
+        io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
+        if (capsule.recipient) {
+          io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
+        }
+      }
+    }
+
+    res.status(200).json({ message: `Event '${eventName}' triggered. Unlocked ${capsulesToUnlock.length} capsules.` });
+  } catch (err) {
+    console.error('[Capsule] Trigger event error:', err.message);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule, triggerEvent };

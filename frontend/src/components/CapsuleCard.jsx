@@ -29,7 +29,13 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
   };
 
   return (
-    <div className={`capsule-card ${statusLower}`} onClick={onClick} role="button" tabIndex={0}>
+    <div 
+      className={`capsule-card ${statusLower}`} 
+      onClick={status === 'DESTROYED' ? undefined : onClick} 
+      role={status === 'DESTROYED' ? undefined : "button"} 
+      tabIndex={status === 'DESTROYED' ? undefined : 0}
+      style={status === 'DESTROYED' ? { cursor: 'default', opacity: 0.7 } : undefined}
+    >
       {/* Type icon */}
       <div className={`capsule-type-icon ${CONTENT_CLASSES[contentType] || 'type-text'}`}>
         {CONTENT_ICONS[contentType] || '📦'}

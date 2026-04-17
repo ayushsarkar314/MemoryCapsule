@@ -11,16 +11,23 @@ const CapsuleViewPage = () => {
   const [capsule, setCapsule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [destroyCountdown, setDestroyCountdown] = useState(null);
 
   useEffect(() => {
     const fetchCapsule = async () => {
       try {
         const res = await api.get(`/capsules/${id}`);
         setCapsule(res.data.capsule);
+        
+        // Start countdown for destroy-after-view capsules
+        if (res.data.capsule.rules?.destroyAfterView && res.data.capsule.destroyAt) {
+          setDestroyCountdown(new Date(res.data.capsule.destroyAt));
+        }
       } catch (err) {
         const msg = err.response?.data?.message || 'Could not open capsule';
         const unlocksAt = err.response?.data?.unlocksAt;
-        setError({ msg, unlocksAt });
+        const isDestroyed = msg.toLowerCase().includes('destroyed');
+        setError({ msg, unlocksAt, isDestroyed });
       } finally {
         setLoading(false);
       }
@@ -37,7 +44,9 @@ const CapsuleViewPage = () => {
   if (error) return (
     <div className="container page-content">
       <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center', paddingTop: 'var(--space-12)' }}>
-        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🔒</div>
+        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
+          {error.isDestroyed ? '💨' : '🔒'}
+        </div>
         <h2 style={{ marginBottom: 'var(--space-4)' }}>{error.msg}</h2>
         {error.unlocksAt && (
           <>
@@ -46,6 +55,11 @@ const CapsuleViewPage = () => {
             </p>
             <Countdown targetDate={new Date(error.unlocksAt)} />
           </>
+        )}
+        {error.isDestroyed && (
+          <p className="text-muted" style={{ marginBottom: 'var(--space-6)' }}>
+            This capsule was destroyed after being viewed and cannot be accessed again.
+          </p>
         )}
         <button className="btn btn-secondary" style={{ marginTop: 'var(--space-8)' }} onClick={() => navigate(-1)}>
           ← Go Back
@@ -80,6 +94,20 @@ const CapsuleViewPage = () => {
             {status === 'DESTROYED' && (
               <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'var(--color-blush)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ color: 'var(--color-rose)', fontWeight: 600 }}>💨 This capsule has been destroyed after being viewed.</p>
+              </div>
+            )}
+
+            {destroyCountdown && status !== 'DESTROYED' && (
+              <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'rgba(255, 193, 7, 0.1)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 193, 7, 0.3)' }}>
+                <p style={{ color: '#856404', fontWeight: 600, textAlign: 'center' }}>
+                  ⏰ This capsule will be destroyed in:
+                </p>
+                <div style={{ textAlign: 'center', marginTop: 'var(--space-2)' }}>
+                  <Countdown targetDate={destroyCountdown} onComplete={() => {
+                    toast.error('This capsule has been destroyed!');
+                    setCapsule(prev => prev ? { ...prev, status: 'DESTROYED' } : null);
+                  }} />
+                </div>
               </div>
             )}
           </div>
