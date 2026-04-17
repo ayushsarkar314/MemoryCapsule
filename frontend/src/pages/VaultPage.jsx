@@ -74,7 +74,7 @@ const VaultPage = () => {
         <p className="section-eyebrow">Personal</p>
         <div className="section-header">
           <h2>My Vault</h2>
-          <div style={{ display: 'flex', gap: 'var(--space-3)'}}>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
             <button className="btn btn-sm" style={{ background: 'var(--color-sand)', color: 'var(--color-text-primary)' }} onClick={fireTriggerEvent}>
               🎉 Trigger Event
             </button>
@@ -107,7 +107,7 @@ const VaultPage = () => {
 
       {/* Content */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: 'var(--space-5)' }}>
+        <div className="vault-grid">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="skeleton" style={{ height: 180, borderRadius: 'var(--radius-xl)' }} />
           ))}

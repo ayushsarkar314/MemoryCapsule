@@ -109,7 +109,7 @@ const GhostWallPage = () => {
   };
 
   return (
-    <div className="ghost-wall page" style={{ paddingTop: 80 }}>
+    <div className="ghost-wall page">
       <div className="container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-16)' }}>
 
         {/* Header */}

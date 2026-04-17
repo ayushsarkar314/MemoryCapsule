@@ -101,21 +101,20 @@ const CreatePage = () => {
         <h2 style={{ marginBottom: 'var(--space-8)' }}>Create a Capsule</h2>
 
         {/* Step indicators */}
-        <div className="flex items-center gap-3" style={{ marginBottom: 'var(--space-8)', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="flex items-center gap-2" style={{ marginBottom: 'var(--space-8)', justifyContent: 'center' }}>
           {['Content', 'Rules', 'Share'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
+            <div key={s} className="flex items-center gap-2" style={{ flexShrink: 1 }}>
               <div className="flex items-center gap-2">
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  background: step > i + 1 ? 'var(--color-sage)' : step === i + 1 ? 'var(--gradient-amber)' : 'var(--color-sand)',
                   color: step >= i + 1 ? '#fff' : 'var(--color-text-muted)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '0.8rem', fontWeight: 700, flexShrink: 0,
                   background: step > i + 1 ? '#8FA88A' : step === i + 1 ? '#D4845A' : '#E8DDD0',
                 }}>{step > i + 1 ? '✓' : i + 1}</div>
-                <span style={{ fontSize: '0.875rem', fontWeight: step === i + 1 ? 600 : 400, color: step === i + 1 ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}>{s}</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: step === i + 1 ? 600 : 400, color: step === i + 1 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{s}</span>
               </div>
-              {i < 2 && <div style={{ flex: 1, height: 1, background: step > i + 1 ? 'var(--color-sage)' : 'var(--color-sand)', width: 32 }} />}
+              {i < 2 && <div style={{ flexShrink: 1, minWidth: 8, height: 1, background: step > i + 1 ? 'var(--color-sage)' : 'var(--color-sand)', width: 32 }} />}
             </div>
           ))}
         </div>

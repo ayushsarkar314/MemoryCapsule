@@ -42,11 +42,11 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
       </div>
 
       {/* Title + badge */}
-      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)' }}>
-        <h4 style={{ fontSize: '1rem', fontFamily: 'var(--font-serif)', fontWeight: 600, lineHeight: 1.3, flex: 1, marginRight: 'var(--space-2)' }}>
+      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <h4 style={{ fontSize: '1rem', fontFamily: 'var(--font-serif)', fontWeight: 600, lineHeight: 1.3, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {title}
         </h4>
-        <span className={`capsule-status-badge badge-${statusLower}`}>
+        <span className={`capsule-status-badge badge-${statusLower}`} style={{ flexShrink: 0 }}>
           {isLocked ? '🔒' : status === 'UNLOCKED' ? '🔓' : status === 'EXPIRED' ? '⏳' : '💨'}
           {' '}{status}
         </span>
