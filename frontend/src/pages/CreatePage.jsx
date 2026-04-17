@@ -101,9 +101,9 @@ const CreatePage = () => {
         <h2 style={{ marginBottom: 'var(--space-8)' }}>Create a Capsule</h2>
 
         {/* Step indicators */}
-        <div className="flex items-center gap-3" style={{ marginBottom: 'var(--space-8)' }}>
+        <div className="flex items-center gap-3" style={{ marginBottom: 'var(--space-8)', flexWrap: 'wrap', justifyContent: 'center' }}>
           {['Content', 'Rules', 'Share'].map((s, i) => (
-            <div key={s} className="flex items-center gap-3">
+            <div key={s} className="flex items-center gap-2">
               <div className="flex items-center gap-2">
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%',

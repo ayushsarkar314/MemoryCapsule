@@ -106,7 +106,7 @@ const FriendsPage = () => {
         {searchResults.length > 0 && (
           <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {searchResults.map(user => (
-              <div key={user._id} className="flex items-center justify-between" style={{ padding: 'var(--space-3)', background: 'rgba(255,255,255,0.6)', borderRadius: 'var(--radius-md)' }}>
+              <div key={user._id} className="flex items-center justify-between" style={{ padding: 'var(--space-3)', background: 'rgba(255,255,255,0.6)', borderRadius: 'var(--radius-md)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
                 <div className="flex items-center gap-3">
                   <UserAvatar user={user} />
                   <div>
@@ -152,7 +152,7 @@ const FriendsPage = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {friends.map(friend => (
-              <div key={friend._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)' }}>
+              <div key={friend._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
                 <div className="flex items-center gap-3">
                   <UserAvatar user={friend} />
                   <div>
@@ -177,7 +177,7 @@ const FriendsPage = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {requests.map(req => (
-              <div key={req._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)' }}>
+              <div key={req._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
                 <div className="flex items-center gap-3">
                   <UserAvatar user={req.from} />
                   <div>

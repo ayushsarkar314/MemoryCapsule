@@ -86,13 +86,13 @@ const ProfilePage = () => {
 
           {/* Read-only info */}
           <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'var(--color-parchment)', borderRadius: 'var(--radius-md)' }}>
-            <div className="flex justify-between" style={{ marginBottom: 'var(--space-2)' }}>
+            <div className="flex justify-between" style={{ marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               <span className="text-sm text-muted">Username</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>@{user?.username}</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem', overflowWrap: 'anywhere' }}>@{user?.username}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between" style={{ flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               <span className="text-sm text-muted">Email</span>
-              <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>{user?.email}</span>
+              <span style={{ fontWeight: 500, fontSize: '0.9rem', overflowWrap: 'anywhere' }}>{user?.email}</span>
             </div>
           </div>
 
