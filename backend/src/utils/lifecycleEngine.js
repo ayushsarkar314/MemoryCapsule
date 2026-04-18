@@ -93,6 +93,31 @@ const expireGhostWallPosts = async () => {
 };
 
 /**
+ * TASK 4: Destroy capsules whose destroyAt has passed
+ */
+const destroyDueCapsules = async () => {
+  const now = new Date();
+  const capsulesToDestroy = await Capsule.find({
+    status: { $ne: 'DESTROYED' },
+    destroyAt: { $ne: null, $lte: now },
+  });
+
+  for (const capsule of capsulesToDestroy) {
+    if (capsule.mediaPublicId) {
+      await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
+    }
+    capsule.status = 'DESTROYED';
+    capsule.mediaUrl = '';
+    capsule.mediaPublicId = '';
+    await capsule.save();
+  }
+
+  if (capsulesToDestroy.length > 0) {
+    console.log(`[Lifecycle] Destroyed ${capsulesToDestroy.length} capsule(s)`);
+  }
+};
+
+/**
  * Start the Lifecycle Engine — runs every minute
  */
 const startLifecycleEngine = () => {
@@ -103,10 +128,11 @@ const startLifecycleEngine = () => {
       await unlockDueCapsules();
       await expireDueCapsules();
       await expireGhostWallPosts();
+      await destroyDueCapsules();
     } catch (err) {
       console.error('[Lifecycle] Error during cron run:', err.message);
     }
   });
 };
 
-module.exports = { startLifecycleEngine, deleteFromCloudinary, getResourceType, unlockDueCapsules, expireDueCapsules, expireGhostWallPosts };
+module.exports = { startLifecycleEngine, deleteFromCloudinary, getResourceType, unlockDueCapsules, expireDueCapsules, expireGhostWallPosts, destroyDueCapsules };

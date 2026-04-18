@@ -809,6 +809,59 @@ a:hover { color: var(--color-amber-dark); }
   gap: var(--space-5);
 }
 
+.shared-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8); /* Increased margin between cards */
+  max-width: 850px;
+  margin: 0 auto;
+  padding-top: var(--space-4);
+}
+
+.shared-list .capsule-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-10) var(--space-8); /* Much taller height */
+  min-height: auto;
+  border: 1px solid rgba(166, 139, 117, 0.4); /* Darker border than background */
+}
+
+.shared-list .capsule-type-icon {
+  margin-bottom: 0;
+  width: 54px;
+  height: 54px;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.shared-list .capsule-card > div:nth-child(2) {
+  flex: 1;
+  margin-bottom: 0 !important;
+}
+
+.shared-list .capsule-card > div:nth-child(3) {
+  margin-bottom: 0 !important;
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-3);
+  margin-right: var(--space-4);
+}
+
+.shared-list .capsule-card > div:nth-child(3) p {
+  margin-bottom: 0 !important;
+}
+
+.shared-list .capsule-card > div:nth-child(4) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
 .vault-empty {
   text-align: center;
   padding: var(--space-16) var(--space-6);
@@ -1154,4 +1207,132 @@ a:hover { color: var(--color-amber-dark); }
   .card, .capsule-card, .ghost-post-card { padding: var(--space-4); }
   .auth-card { padding: var(--space-6) var(--space-4); }
   .card-glass { padding: var(--space-5) !important; }
+}
+
+/* ===================================================== */
+/*  SUCCESS ANIMATIONS                                   */
+/* ===================================================== */
+
+/* ===================================================== */
+/*  POSTMAN SUCCESS ANIMATIONS (REFINED SEQUENCE)        */
+/* ===================================================== */
+
+@keyframes envelope-pop-first {
+  0% { transform: translate(-50%, -120%) scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: translate(-50%, -130%) scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: translate(-50%, -120%) scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes vault-entrance-after {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes envelope-tuck-inside {
+  0% { transform: translate(-50%, -120%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -40%) scale(0); opacity: 0; }
+}
+
+@keyframes vault-seal-and-send-refined {
+  0%, 40% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); filter: brightness(1.5); }
+  60% { transform: translate(-50%, -50%) scale(1) rotate(-5deg); }
+  85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(150vw, -150vh) scale(0.5) rotate(15deg); opacity: 0; }
+}
+
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(250, 246, 241, 0.4); 
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.vault-animation {
+  font-size: 8rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Delayed entry until envelope is ready */
+  animation: 
+    vault-entrance-after 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.7s both,
+    vault-seal-and-send-refined 3s ease 0.7s forwards;
+  filter: drop-shadow(0 20px 40px rgba(107, 79, 58, 0.4));
+}
+
+.envelope-flying {
+  font-size: 4rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: 
+    envelope-pop-first 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    envelope-tuck-inside 0.8s ease-in-out 1.5s forwards;
+}
+
+.clickable-image {
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.clickable-image:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* RECORDER STYLES */
+.record-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--color-rose);
+  border-radius: 50%;
+}
+
+.record-dot.pulse {
+  animation: pulse-red 1.2s infinite ease-in-out;
+}
+
+.record-dot.ready {
+  background: var(--color-amber);
+  box-shadow: 0 0 8px var(--color-amber);
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(201, 120, 120, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(201, 120, 120, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(201, 120, 120, 0); }
+}
+
+.voice-waves {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.voice-waves span {
+  width: 4px;
+  height: 10px;
+  background: var(--color-sage);
+  border-radius: 2px;
+  animation: sound-wave 1s infinite ease-in-out;
+}
+
+.voice-waves span:nth-child(2) { animation-delay: 0.1s; height: 20px; }
+.voice-waves span:nth-child(3) { animation-delay: 0.2s; height: 30px; }
+.voice-waves span:nth-child(4) { animation-delay: 0.3s; height: 20px; }
+.voice-waves span:nth-child(5) { animation-delay: 0.4s; height: 10px; }
+
+@keyframes sound-wave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(2); }
 }

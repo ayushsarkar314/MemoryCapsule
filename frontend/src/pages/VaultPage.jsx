@@ -71,7 +71,7 @@ const VaultPage = () => {
     <div className="container page-content">
       {/* Header */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
-        <p className="section-eyebrow">Personal</p>
+        
         <div className="section-header">
           <h2>My Vault</h2>
           <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>

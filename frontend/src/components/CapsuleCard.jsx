@@ -36,10 +36,6 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
       tabIndex={status === 'DESTROYED' ? undefined : 0}
       style={status === 'DESTROYED' ? { cursor: 'default', opacity: 0.7 } : undefined}
     >
-      {/* Type icon */}
-      <div className={`capsule-type-icon ${CONTENT_CLASSES[contentType] || 'type-text'}`}>
-        {CONTENT_ICONS[contentType] || '📦'}
-      </div>
 
       {/* Title + badge */}
       <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
@@ -72,12 +68,6 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
       </div>
 
       {/* Recipient/sender */}
-      {capsuleType === 'shared' && recipient && (
-        <p className="text-xs text-muted" style={{ marginBottom: 'var(--space-3)' }}>
-          💌 To: <strong>{recipient.displayName || recipient.username}</strong>
-          {seenByRecipient && ' · Seen ✓'}
-        </p>
-      )}
       {capsuleType === 'shared' && creator && (
         <p className="text-xs text-muted" style={{ marginBottom: 'var(--space-3)' }}>
           From: <strong>{creator.displayName || creator.username}</strong>

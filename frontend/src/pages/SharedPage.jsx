@@ -38,7 +38,7 @@ const SharedPage = () => {
 
   return (
     <div className="container page-content">
-      <p className="section-eyebrow">Connections</p>
+      
       <div className="section-header" style={{ marginBottom: 'var(--space-6)' }}>
         <h2>Shared Capsules</h2>
         <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
@@ -55,8 +55,8 @@ const SharedPage = () => {
       </div>
 
       {loading ? (
-        <div className="vault-grid">
-          {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 180, borderRadius: 'var(--radius-xl)' }} />)}
+        <div className="shared-list">
+          {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 'var(--radius-xl)' }} />)}
         </div>
       ) : activeCapsules.length === 0 ? (
         <div className="vault-empty">
@@ -72,7 +72,7 @@ const SharedPage = () => {
           </button>
         </div>
       ) : (
-        <div className="vault-grid">
+        <div className="shared-list">
           {activeCapsules.map((capsule) => (
             <CapsuleCard key={capsule._id} capsule={capsule} onClick={() => navigate(`/capsule/${capsule._id}`)} onRefresh={fetchAll} />
           ))}
