@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import CapsuleCard from '../components/CapsuleCard';
+import TerminalApp from "../components/TerminalApp";
 import { useSocket } from '../context/SocketContext';
 
 const TABS = [
-  { key: 'unlocked',  label: 'Unlocked',  icon: '🔓', color: 'var(--color-unlocked)' },
-  { key: 'locked',    label: 'Locked',    icon: '🔒', color: 'var(--color-locked)' },
-  { key: 'expired',   label: 'Expired',   icon: '⏳', color: 'var(--color-expired)' },
+  { key: 'unlocked', label: 'Unlocked', icon: '🔓', color: 'var(--color-unlocked)' },
+  { key: 'locked', label: 'Locked', icon: '🔒', color: 'var(--color-locked)' },
+  { key: 'expired', label: 'Expired', icon: '⏳', color: 'var(--color-expired)' },
   { key: 'destroyed', label: 'Destroyed', icon: '💨', color: 'var(--color-destroyed)' },
 ];
 
 const VaultPage = () => {
+  const [isTerminalMode, setIsTerminalMode] = useState(false);
   const [vault, setVault] = useState({ locked: [], unlocked: [], expired: [], destroyed: [] });
   const [activeTab, setActiveTab] = useState('unlocked');
   const [loading, setLoading] = useState(true);
@@ -54,8 +56,23 @@ const VaultPage = () => {
 
   const activeCapsules = vault[activeTab] || [];
 
+  if (isTerminalMode) {
+    return (
+      <div className="terminal-theme-wrapper">
+        <TerminalApp onExit={() => setIsTerminalMode(false)} />
+      </div>
+    );
+  }
+
   return (
-    <div className="container page-content">
+    <div className="container page-content" style={{ position: 'relative' }}>
+      <button 
+        className="btn btn-secondary theme-toggle-btn"
+        onClick={() => setIsTerminalMode(true)}
+        style={{ top: '0', right: '0' }}
+      >
+        Terminal Mode
+      </button>
       {/* Header */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
         
