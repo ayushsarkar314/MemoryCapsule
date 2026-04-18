@@ -2049,3 +2049,85 @@ a:hover {
 .mossy-panel .text-muted {
   color: rgba(255, 255, 255, 0.5) !important;
 }
+
+/* theme-ocean-pink - Applied to Shared Page */
+.theme-ocean-pink {
+  background-image: url('/assets/ocean-pink.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* theme-sky-pink - Applied to Friends Page */
+.theme-sky-pink {
+  background-image: url('/assets/sky-pink.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Responsive and Interactive Adjustments for Themes */
+.theme-ocean-pink .section-header h2,
+.theme-sky-pink h2 {
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.theme-ocean-pink .status-tabs,
+.theme-sky-pink .status-tabs {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theme-ocean-pink .status-tab,
+.theme-sky-pink .status-tab {
+  color: #1e1e1e;
+}
+
+.theme-ocean-pink .status-tab.active,
+.theme-sky-pink .status-tab.active {
+  background: rgba(255, 255, 255, 0.4);
+  color: #000;
+}
+
+.theme-ocean-pink .card-glass,
+.theme-sky-pink .card-glass,
+.theme-ocean-pink .capsule-card,
+.theme-sky-pink .card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  color: #fff;
+}
+
+.theme-ocean-pink .capsule-card h3,
+.theme-ocean-pink .capsule-card p,
+.theme-sky-pink .card p,
+.theme-sky-pink .card h4,
+.theme-sky-pink .card h3 {
+  color: #1e1e1e !important;
+}
+
+.theme-ocean-pink .btn-primary,
+.theme-sky-pink .btn-primary {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: #3d2b1f;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+}
+
+.theme-ocean-pink .btn-primary:hover,
+.theme-sky-pink .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 154, 158, 0.6);
+}
+
+.theme-sky-pink .avatar-placeholder {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important;
+}
