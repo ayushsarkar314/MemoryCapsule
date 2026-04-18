@@ -87,7 +87,7 @@ const FriendsPage = () => {
 
   return (
     <div className="container page-content">
-      <p className="section-eyebrow">Community</p>
+     
       <h2 style={{ marginBottom: 'var(--space-8)' }}>Friends</h2>
 
       {/* Search */}
@@ -106,15 +106,15 @@ const FriendsPage = () => {
         {searchResults.length > 0 && (
           <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {searchResults.map(user => (
-              <div key={user._id} className="flex items-center justify-between" style={{ padding: 'var(--space-3)', background: 'rgba(255,255,255,0.6)', borderRadius: 'var(--radius-md)' }}>
-                <div className="flex items-center gap-3">
+              <div key={user._id} className="flex items-center justify-between" style={{ padding: 'var(--space-3)', background: 'rgba(255,255,255,0.6)', borderRadius: 'var(--radius-md)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+                <div className="flex items-center gap-3" style={{ minWidth: 0 }}>
                   <UserAvatar user={user} />
-                  <div>
-                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user.displayName || user.username}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.displayName || user.username}</p>
                     <p className="text-xs text-muted">@{user.username}</p>
                   </div>
                 </div>
-                <button className="btn btn-primary btn-sm" onClick={() => sendRequest(user._id, user.username)}>
+                <button className="btn btn-primary btn-sm" style={{ flexShrink: 0 }} onClick={() => sendRequest(user._id, user.username)}>
                   Add Friend
                 </button>
               </div>
@@ -152,16 +152,16 @@ const FriendsPage = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {friends.map(friend => (
-              <div key={friend._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)' }}>
-                <div className="flex items-center gap-3">
+              <div key={friend._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+                <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
                   <UserAvatar user={friend} />
-                  <div>
-                    <p style={{ fontWeight: 600 }}>{friend.displayName || friend.username}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friend.displayName || friend.username}</p>
                     <p className="text-xs text-muted">@{friend.username}</p>
-                    {friend.bio && <p className="text-xs text-muted" style={{ marginTop: 2 }}>{friend.bio}</p>}
+                    {friend.bio && <p className="text-xs text-muted" style={{ marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friend.bio}</p>}
                   </div>
                 </div>
-                <button className="btn btn-ghost btn-sm" style={{ color: 'var(--color-rose)' }} onClick={() => removeFriend(friend._id, friend.username)}>
+                <button className="btn btn-ghost btn-sm" style={{ color: 'var(--color-rose)', flexShrink: 0 }} onClick={() => removeFriend(friend._id, friend.username)}>
                   Remove
                 </button>
               </div>
@@ -177,15 +177,15 @@ const FriendsPage = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {requests.map(req => (
-              <div key={req._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)' }}>
-                <div className="flex items-center gap-3">
+              <div key={req._id} className="card flex items-center justify-between" style={{ padding: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+                <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
                   <UserAvatar user={req.from} />
-                  <div>
-                    <p style={{ fontWeight: 600 }}>{req.from.displayName || req.from.username}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.from.displayName || req.from.username}</p>
                     <p className="text-xs text-muted">@{req.from.username} wants to be friends</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2" style={{ flexShrink: 0 }}>
                   <button className="btn btn-primary btn-sm" onClick={() => respondRequest(req.from._id, 'accept')}>Accept</button>
                   <button className="btn btn-ghost btn-sm" onClick={() => respondRequest(req.from._id, 'reject')}>Decline</button>
                 </div>

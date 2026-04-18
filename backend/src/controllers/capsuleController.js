@@ -1,6 +1,58 @@
 const Capsule = require('../models/Capsule');
 const cloudinary = require('../config/cloudinary');
 const { deleteFromCloudinary, getResourceType } = require('../utils/lifecycleEngine');
+const { getIo } = require('../config/socket');
+
+/**
+ * HELPER: Sync a capsule's status on-the-fly based on current time
+ */
+const syncCapsuleStatus = async (capsule) => {
+  if (!capsule) return capsule;
+  const now = new Date();
+  let changed = false;
+
+  // 1. LOCKED -> UNLOCKED (Time-based unlock)
+  if (capsule.status === 'LOCKED' && capsule.rules.unlockAt && capsule.rules.unlockAt <= now) {
+    capsule.status = 'UNLOCKED';
+    changed = true;
+  }
+
+  // 2. LOCKED/UNLOCKED -> EXPIRED (Expiration date)
+  if (['LOCKED', 'UNLOCKED'].includes(capsule.status) && capsule.rules.expireAt && capsule.rules.expireAt <= now) {
+    if (capsule.mediaPublicId) {
+      await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
+    }
+    capsule.status = 'EXPIRED';
+    capsule.mediaUrl = '';
+    capsule.mediaPublicId = '';
+    changed = true;
+  }
+
+  // 3. ANY -> DESTROYED (Single-view timer)
+  if (capsule.status !== 'DESTROYED' && capsule.destroyAt && capsule.destroyAt <= now) {
+    if (capsule.mediaPublicId) {
+      await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
+    }
+    capsule.status = 'DESTROYED';
+    capsule.mediaUrl = '';
+    capsule.mediaPublicId = '';
+    changed = true;
+  }
+
+  if (changed) {
+    await capsule.save();
+    // Emit real-time change
+    const io = getIo();
+    if (io) {
+      io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: capsule.status });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: capsule.status });
+      }
+    }
+  }
+
+  return capsule;
+};
 
 // @desc    Create a new capsule
 // @route   POST /api/capsules
@@ -14,7 +66,7 @@ const createCapsule = async (req, res) => {
     }
 
     // Validate rule
-    if (!ruleType || !['unlockAt', 'destroyAfterView', 'expireAt'].includes(ruleType)) {
+    if (!ruleType || !['unlockAt', 'destroyAfterView', 'expireAt', 'eventName'].includes(ruleType)) {
       return res.status(400).json({ message: 'A valid rule type is required' });
     }
 
@@ -27,12 +79,16 @@ const createCapsule = async (req, res) => {
 
     if (ruleType === 'unlockAt') {
       if (!ruleValue) return res.status(400).json({ message: 'Unlock date is required' });
-      rules.unlockAt = new Date(ruleValue);
+      const unlockDate = new Date(ruleValue);
+      if (unlockDate <= new Date()) return res.status(400).json({ message: 'Unlock date must be in the future' });
+      rules.unlockAt = unlockDate;
     } else if (ruleType === 'destroyAfterView') {
       rules.destroyAfterView = true;
     } else if (ruleType === 'expireAt') {
       if (!ruleValue) return res.status(400).json({ message: 'Expiry date is required' });
-      rules.expireAt = new Date(ruleValue);
+      const expireDate = new Date(ruleValue);
+      if (expireDate <= new Date()) return res.status(400).json({ message: 'Expiry date must be in the future' });
+      rules.expireAt = expireDate;
     }
 
     // Handle media
@@ -78,8 +134,11 @@ const getVault = async (req, res) => {
   try {
     const capsules = await Capsule.find({
       creator: req.user._id,
-      capsuleType: 'personal',
+      // Removed capsuleType: 'personal' to include all created capsules in Vault stats
     }).sort({ createdAt: -1 });
+
+    // Sync all statuses before grouping
+    await Promise.all(capsules.map(c => syncCapsuleStatus(c)));
 
     const vault = {
       locked: capsules.filter((c) => c.status === 'LOCKED'),
@@ -106,6 +165,9 @@ const getSentCapsules = async (req, res) => {
       .populate('recipient', 'username displayName avatar')
       .sort({ createdAt: -1 });
 
+    // Sync statuses
+    await Promise.all(capsules.map(c => syncCapsuleStatus(c)));
+
     res.status(200).json({ capsules });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -123,6 +185,9 @@ const getReceivedCapsules = async (req, res) => {
       .populate('creator', 'username displayName avatar')
       .sort({ createdAt: -1 });
 
+    // Sync statuses
+    await Promise.all(capsules.map(c => syncCapsuleStatus(c)));
+
     res.status(200).json({ capsules });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -134,11 +199,14 @@ const getReceivedCapsules = async (req, res) => {
 // @access  Private
 const viewCapsule = async (req, res) => {
   try {
-    const capsule = await Capsule.findById(req.params.id)
+    let capsule = await Capsule.findById(req.params.id)
       .populate('creator', 'username displayName avatar')
       .populate('recipient', 'username displayName avatar');
 
     if (!capsule) return res.status(404).json({ message: 'Capsule not found' });
+
+    // Sync status before checking authorization
+    capsule = await syncCapsuleStatus(capsule);
 
     // Authorization: only creator or recipient can view
     const isCreator = capsule.creator._id.toString() === req.user._id.toString();
@@ -166,39 +234,29 @@ const viewCapsule = async (req, res) => {
       // Mark as seen first, then schedule destruction
       capsule.seenByRecipient = true;
       capsule.seenAt = new Date();
+      capsule.destroyAt = new Date(Date.now() + 30000); // Destroy in 30 seconds
       await capsule.save();
 
       const responseData = { capsule };
 
-      // Destroy after sending response
+      // Send response immediately
       res.status(200).json(responseData);
 
-      // Clean up after response
-      if (capsule.mediaPublicId) {
-        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
-      }
-      capsule.status = 'DESTROYED';
-      capsule.mediaUrl = '';
-      capsule.mediaPublicId = '';
-      capsule.textContent = ''; // wipe text too
-      await capsule.save();
+      console.log(`[Capsule] Scheduled destruction for capsule ${capsule._id} at ${capsule.destroyAt} (in ${(capsule.destroyAt - Date.now()) / 1000} seconds)`);
 
       return;
     }
 
     // For personal destroy-after-view capsules: destroy on view
-    if (capsule.rules.destroyAfterView && isCreator && capsule.capsuleType === 'personal') {
+    if (capsule.rules.destroyAfterView && isCreator && capsule.capsuleType === 'personal' && !capsule.destroyAt) {
+      capsule.destroyAt = new Date(Date.now() + 30000); // Destroy in 30 seconds
+      await capsule.save();
+
       const responseData = { capsule };
       res.status(200).json(responseData);
 
-      if (capsule.mediaPublicId) {
-        await deleteFromCloudinary(capsule.mediaPublicId, getResourceType(capsule.mediaPublicId));
-      }
-      capsule.status = 'DESTROYED';
-      capsule.mediaUrl = '';
-      capsule.mediaPublicId = '';
-      capsule.textContent = '';
-      await capsule.save();
+      console.log(`[Capsule] Scheduled destruction for personal capsule ${capsule._id} at ${capsule.destroyAt}`);
+
       return;
     }
 
@@ -233,6 +291,16 @@ const deleteCapsule = async (req, res) => {
     }
 
     await capsule.deleteOne();
+    
+    // Emit event
+    const io = getIo();
+    if (io) {
+      io.to(req.user._id.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DELETED' });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'DELETED' });
+      }
+    }
+
     res.status(200).json({ message: 'Capsule deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 import Countdown from '../components/Countdown';
 
 const CapsuleViewPage = () => {
@@ -11,16 +12,38 @@ const CapsuleViewPage = () => {
   const [capsule, setCapsule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [destroyCountdown, setDestroyCountdown] = useState(null);
+  const [isImageFull, setIsImageFull] = useState(false);
 
   useEffect(() => {
     const fetchCapsule = async () => {
       try {
         const res = await api.get(`/capsules/${id}`);
-        setCapsule(res.data.capsule);
+        const fetchedCapsule = res.data.capsule;
+        setCapsule(fetchedCapsule);
+        
+        // Start countdown for destroy-after-view capsules
+        if (fetchedCapsule.rules?.destroyAfterView && fetchedCapsule.destroyAt) {
+          setDestroyCountdown(new Date(fetchedCapsule.destroyAt));
+        }
+
+        // Trigger confetti for celebratory keywords
+        const keywords = ['birthday', 'anniversary', 'congratulations', 'happy'];
+        const celebrCheck = (fetchedCapsule.title || '') + ' ' + (fetchedCapsule.textContent || '');
+        if (keywords.some(k => celebrCheck.toLowerCase().includes(k))) {
+          // Fire a burst
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#D4845A', '#C97878', '#F2DDD8', '#8FA88A']
+          });
+        }
       } catch (err) {
         const msg = err.response?.data?.message || 'Could not open capsule';
         const unlocksAt = err.response?.data?.unlocksAt;
-        setError({ msg, unlocksAt });
+        const isDestroyed = msg.toLowerCase().includes('destroyed');
+        setError({ msg, unlocksAt, isDestroyed });
       } finally {
         setLoading(false);
       }
@@ -37,7 +60,9 @@ const CapsuleViewPage = () => {
   if (error) return (
     <div className="container page-content">
       <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center', paddingTop: 'var(--space-12)' }}>
-        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>🔒</div>
+        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
+          {error.isDestroyed ? '💨' : '🔒'}
+        </div>
         <h2 style={{ marginBottom: 'var(--space-4)' }}>{error.msg}</h2>
         {error.unlocksAt && (
           <>
@@ -46,6 +71,11 @@ const CapsuleViewPage = () => {
             </p>
             <Countdown targetDate={new Date(error.unlocksAt)} />
           </>
+        )}
+        {error.isDestroyed && (
+          <p className="text-muted" style={{ marginBottom: 'var(--space-6)' }}>
+            This capsule was destroyed after being viewed and cannot be accessed again.
+          </p>
         )}
         <button className="btn btn-secondary" style={{ marginTop: 'var(--space-8)' }} onClick={() => navigate(-1)}>
           ← Go Back
@@ -68,9 +98,6 @@ const CapsuleViewPage = () => {
         <div className="card-glass" style={{ padding: 'var(--space-10)' }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>
-              {contentType === 'text' ? '📝' : contentType === 'image' ? '🖼️' : contentType === 'voice' ? '🎙️' : '🎬'}
-            </div>
             <h2 className="font-serif" style={{ marginBottom: 'var(--space-2)' }}>{title}</h2>
             <p className="text-xs text-muted">
               Created {format(new Date(createdAt), 'MMMM d, yyyy')}
@@ -80,6 +107,20 @@ const CapsuleViewPage = () => {
             {status === 'DESTROYED' && (
               <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'var(--color-blush)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ color: 'var(--color-rose)', fontWeight: 600 }}>💨 This capsule has been destroyed after being viewed.</p>
+              </div>
+            )}
+
+            {destroyCountdown && status !== 'DESTROYED' && (
+              <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'rgba(255, 193, 7, 0.1)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 193, 7, 0.3)' }}>
+                <p style={{ color: '#856404', fontWeight: 600, textAlign: 'center' }}>
+                  ⏰ This capsule will be destroyed in:
+                </p>
+                <div style={{ textAlign: 'center', marginTop: 'var(--space-2)' }}>
+                  <Countdown targetDate={destroyCountdown} onComplete={() => {
+                    toast.error('This capsule has been destroyed!');
+                    setCapsule(prev => prev ? { ...prev, status: 'DESTROYED' } : null);
+                  }} />
+                </div>
               </div>
             )}
           </div>
@@ -104,8 +145,14 @@ const CapsuleViewPage = () => {
               )}
 
               {contentType === 'image' && mediaUrl && (
-                <img src={mediaUrl} alt={title}
-                  style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }} />
+                <div 
+                  onClick={() => setIsImageFull(true)} 
+                  style={{ cursor: 'zoom-in' }}
+                  className="image-content-wrapper clickable-image"
+                >
+                  <img src={mediaUrl} alt={title}
+                    style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }} />
+                </div>
               )}
 
               {contentType === 'voice' && mediaUrl && (
@@ -126,10 +173,51 @@ const CapsuleViewPage = () => {
             {rules?.destroyAfterView && <span className="capsule-status-badge badge-destroyed">💣 Destroyed after view</span>}
             {rules?.unlockAt && <span className="capsule-status-badge badge-locked">⏰ Unlocked {formatDistanceToNow(new Date(rules.unlockAt), { addSuffix: true })}</span>}
             {rules?.expireAt && <span className="capsule-status-badge badge-expired">⌛ Expired {formatDistanceToNow(new Date(rules.expireAt), { addSuffix: true })}</span>}
-            {recipient && <span className="capsule-status-badge badge-unlocked">💌 Sent to {recipient.displayName || recipient.username}</span>}
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Lightbox Overlay */}
+      {isImageFull && (
+        <div 
+          onClick={() => setIsImageFull(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.92)',
+            zIndex: 10001,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'zoom-out',
+            animation: 'fadeIn 0.3s ease'
+          }}
+        >
+          <img 
+            src={mediaUrl} 
+            alt={title} 
+            style={{ 
+              maxWidth: '95vw', 
+              maxHeight: '95vh', 
+              objectFit: 'contain',
+              borderRadius: 'var(--radius-sm)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+            }} 
+          />
+          <button 
+            style={{ 
+              position: 'absolute', 
+              top: '20px', 
+              right: '20px', 
+              background: 'none', 
+              border: 'none', 
+              color: 'white', 
+              fontSize: '2rem', 
+              cursor: 'pointer' 
+            }}
+          >✕</button>
+        </div>
+      )}
     </div>
   );
 };

@@ -22,7 +22,7 @@ const storage = new CloudinaryStorage({
     return {
       folder,
       resource_type: resourceType,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'mp3', 'wav', 'm4a', 'ogg'],
+      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'mp3', 'wav', 'm4a', 'ogg', 'webm'],
     };
   },
 });
@@ -30,13 +30,13 @@ const storage = new CloudinaryStorage({
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-    'video/mp4', 'video/quicktime',
+    'video/mp4', 'video/quicktime', 'video/webm',
     'audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/ogg', 'audio/webm',
   ];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Unsupported file type'), false);
+    cb(new Error(`Unsupported file type: ${file.mimetype}`), false);
   }
 };
 

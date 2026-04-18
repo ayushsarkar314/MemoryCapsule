@@ -1,5 +1,7 @@
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sendPasswordResetEmail } = require('../utils/email');
 
 // ─────────────────────────────────────────────
 //  Token helpers
@@ -238,4 +240,135 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, refresh, logout, getMe, updateProfile };
+// @desc    Forgot password — generate reset token & send email
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide your email address' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    // Always respond the same way to prevent email enumeration
+    if (!user) {
+      return res.status(200).json({
+        message: 'If that email is registered, a reset link has been sent.',
+      });
+    }
+
+    // Generate a secure random token (raw = sent in email, hashed = stored in DB)
+    const rawToken  = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    // Store hashed token + expiry (configurable via env, defaults to 10 min)
+    const expiryMinutes = parseInt(process.env.OTP_EXPIRY_MINUTES) || 10;
+    user.passwordResetToken   = hashedToken;
+    user.passwordResetExpires = Date.now() + expiryMinutes * 60 * 1000;
+    await user.save({ validateBeforeSave: false });
+
+    // Build reset URL using CLIENT_URL env var (works in dev & production)
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
+
+    try {
+      await sendPasswordResetEmail(user.email, resetUrl);
+    } catch (emailErr) {
+      // Roll back token fields if email fails
+      user.passwordResetToken   = null;
+      user.passwordResetExpires = null;
+      await user.save({ validateBeforeSave: false });
+      console.error('[Auth] Failed to send reset email:', emailErr.message);
+      return res.status(500).json({ message: 'Failed to send reset email. Please try again.' });
+    }
+
+    res.status(200).json({
+      message: 'If that email is registered, a reset link has been sent.',
+    });
+  } catch (err) {
+    console.error('[Auth] forgotPassword error:', err.message);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+};
+
+// @desc    Reset password using token from email
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: 'Token and new password are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Hash the incoming raw token to compare with the stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      passwordResetToken:   hashedToken,
+      passwordResetExpires: { $gt: Date.now() }, // not expired yet
+    }).select('+passwordResetToken +passwordResetExpires');
+
+    if (!user) {
+      return res.status(400).json({ message: 'Reset link is invalid or has expired.' });
+    }
+
+    // Update password and clear reset fields
+    user.password             = newPassword; // pre-save hook will hash it
+    user.passwordResetToken   = null;
+    user.passwordResetExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successful. You can now log in.' });
+  } catch (err) {
+    console.error('[Auth] resetPassword error:', err.message);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+};
+
+// @desc    Change password (logged-in user)
+// @route   POST /api/auth/change-password
+// @access  Private
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current and new passwords are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
+    }
+
+    // Fetch user with their hashed password
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Update — pre-save hook will hash the new password
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('[Auth] changePassword error:', err.message);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+};
+
+module.exports = { register, login, refresh, logout, getMe, updateProfile, forgotPassword, resetPassword, changePassword };

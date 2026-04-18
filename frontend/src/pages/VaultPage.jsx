@@ -4,6 +4,7 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import CapsuleCard from '../components/CapsuleCard';
 import TerminalApp from "../components/TerminalApp";
+import { useSocket } from '../context/SocketContext';
 
 const TABS = [
   { key: 'unlocked', label: 'Unlocked', icon: '🔓', color: 'var(--color-unlocked)' },
@@ -32,6 +33,27 @@ const VaultPage = () => {
 
   useEffect(() => { fetchVault(); }, []);
 
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+    
+    const handleStatusChanged = (data) => {
+      if (data.event) {
+        toast.success(`Event '${data.event}' unlocked ${data.count} capsules!`);
+      } else if (data.status) {
+        toast(`A capsule status changed to ${data.status}`, { icon: '🔔' });
+      }
+      fetchVault();
+    };
+
+    socket.on('capsule_status_changed', handleStatusChanged);
+
+    return () => {
+      socket.off('capsule_status_changed', handleStatusChanged);
+    };
+  }, [socket]);
+
   const activeCapsules = vault[activeTab] || [];
 
   if (isTerminalMode) {
@@ -53,12 +75,14 @@ const VaultPage = () => {
       </button>
       {/* Header */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
-        <p className="section-eyebrow">Personal</p>
+        
         <div className="section-header">
           <h2>My Vault</h2>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
-            ✨ New Capsule
-          </button>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
+              ✨ New Capsule
+            </button>
+          </div>
         </div>
 
         {/* Stats row */}
@@ -84,7 +108,7 @@ const VaultPage = () => {
 
       {/* Content */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: 'var(--space-5)' }}>
+        <div className="vault-grid">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="skeleton" style={{ height: 180, borderRadius: 'var(--radius-xl)' }} />
           ))}

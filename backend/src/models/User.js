@@ -62,6 +62,18 @@ const userSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
+
+    // Password reset — hashed token + expiry (10 min window)
+    passwordResetToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    passwordResetExpires: {
+      type: Date,
+      default: null,
+      select: false,
+    },
   },
   { timestamps: true }
 );

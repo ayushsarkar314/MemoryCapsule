@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 
-const Countdown = ({ targetDate }) => {
+const Countdown = ({ targetDate, onComplete }) => {
   const [timeLeft, setTimeLeft] = useState({});
 
   useEffect(() => {
@@ -12,6 +12,7 @@ const Countdown = ({ targetDate }) => {
 
       if (totalSecs <= 0) {
         setTimeLeft({ done: true });
+        if (onComplete) onComplete();
         return;
       }
 
@@ -25,7 +26,7 @@ const Countdown = ({ targetDate }) => {
     calc();
     const interval = setInterval(calc, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, [targetDate, onComplete]);
 
   if (timeLeft.done) return (
     <div style={{ textAlign: 'center', color: 'var(--color-sage)', fontWeight: 600 }}>

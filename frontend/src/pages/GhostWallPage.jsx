@@ -109,7 +109,7 @@ const GhostWallPage = () => {
   };
 
   return (
-    <div className="ghost-wall page" style={{ paddingTop: 80 }}>
+    <div className="ghost-wall page">
       <div className="container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-16)' }}>
 
         {/* Header */}
@@ -243,9 +243,9 @@ const GhostWallPage = () => {
                   <img src={post.mediaUrl} alt="ghost post" style={{ width: '100%', maxHeight: 320, objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)' }} />
                 ) : null}
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" style={{ flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                   <GhostTimer expiresAt={post.expiresAt} />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
                     {[['heart', '❤️'], ['ghost', '👻'], ['fire', '🔥']].map(([key, emoji]) => (
                       <button key={key} className="ghost-reaction-btn" onClick={() => handleReact(post._id, key)}>
                         {emoji} {post.reactions[key] > 0 && post.reactions[key]}

@@ -29,18 +29,20 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
   };
 
   return (
-    <div className={`capsule-card ${statusLower}`} onClick={onClick} role="button" tabIndex={0}>
-      {/* Type icon */}
-      <div className={`capsule-type-icon ${CONTENT_CLASSES[contentType] || 'type-text'}`}>
-        {CONTENT_ICONS[contentType] || '📦'}
-      </div>
+    <div 
+      className={`capsule-card ${statusLower}`} 
+      onClick={status === 'DESTROYED' ? undefined : onClick} 
+      role={status === 'DESTROYED' ? undefined : "button"} 
+      tabIndex={status === 'DESTROYED' ? undefined : 0}
+      style={status === 'DESTROYED' ? { cursor: 'default', opacity: 0.7 } : undefined}
+    >
 
       {/* Title + badge */}
-      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)' }}>
-        <h4 style={{ fontSize: '1rem', fontFamily: 'var(--font-serif)', fontWeight: 600, lineHeight: 1.3, flex: 1, marginRight: 'var(--space-2)' }}>
+      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <h4 style={{ fontSize: '1rem', fontFamily: 'var(--font-serif)', fontWeight: 600, lineHeight: 1.3, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {title}
         </h4>
-        <span className={`capsule-status-badge badge-${statusLower}`}>
+        <span className={`capsule-status-badge badge-${statusLower}`} style={{ flexShrink: 0 }}>
           {isLocked ? '🔒' : status === 'UNLOCKED' ? '🔓' : status === 'EXPIRED' ? '⏳' : '💨'}
           {' '}{status}
         </span>
@@ -66,12 +68,6 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
       </div>
 
       {/* Recipient/sender */}
-      {capsuleType === 'shared' && recipient && (
-        <p className="text-xs text-muted" style={{ marginBottom: 'var(--space-3)' }}>
-          💌 To: <strong>{recipient.displayName || recipient.username}</strong>
-          {seenByRecipient && ' · Seen ✓'}
-        </p>
-      )}
       {capsuleType === 'shared' && creator && (
         <p className="text-xs text-muted" style={{ marginBottom: 'var(--space-3)' }}>
           From: <strong>{creator.displayName || creator.username}</strong>
