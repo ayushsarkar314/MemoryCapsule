@@ -88,7 +88,7 @@ const CreatePage = () => {
   }, [isRecording]);
 
   useEffect(() => {
-    if ((recordingStatus === 'recording' || recordingStatus === 'open') && streamRef.current && contentType === 'video') {
+    if ((recordingStatus === 'recording' || recordingStatus === 'open') && streamRef.current && (contentType === 'video' || contentType === 'image')) {
       if (videoPreviewRef.current) {
         videoPreviewRef.current.srcObject = streamRef.current;
       }
@@ -104,8 +104,8 @@ const CreatePage = () => {
   const startCamera = async () => {
     try {
       const constraints = {
-        audio: true,
-        video: contentType === 'video'
+        audio: contentType !== 'image',
+        video: contentType === 'video' || contentType === 'image'
       };
       
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -116,6 +116,35 @@ const CreatePage = () => {
       console.error('Camera/Mic access error:', err);
       toast.error('Could not access camera/microphone. Please check permissions.');
     }
+  };
+
+  const takePhoto = () => {
+    if (!videoPreviewRef.current || !streamRef.current) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoPreviewRef.current.videoWidth;
+    canvas.height = videoPreviewRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Mirror if necessary
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(videoPreviewRef.current, 0, 0);
+
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      setRecordedUrl(url);
+      
+      const file = new File([blob], `captured-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      setMediaFile(file);
+      setRecordingStatus('preview');
+      
+      // Stop camera
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    }, 'image/jpeg', 0.9);
   };
 
   const startRecording = () => {
@@ -194,11 +223,37 @@ const CreatePage = () => {
     maxFiles: 1,
   });
 
+  const validateRule = () => {
+    if (ruleType === 'destroyAfterView') return true;
+    
+    if (ruleType === 'eventName') {
+      if (!ruleValue) {
+        toast.error('Please enter an event name');
+        return false;
+      }
+      return true;
+    }
+
+    if (!ruleValue) {
+      toast.error(`Please set the ${ruleType === 'unlockAt' ? 'unlock' : 'expiry'} date`);
+      return false;
+    }
+
+    const selectedDate = new Date(ruleValue);
+    const now = new Date();
+    if (isNaN(selectedDate.getTime()) || selectedDate <= now) {
+      toast.error(`The ${ruleType === 'unlockAt' ? 'unlock' : 'expiry'} date must be in the future`);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) return toast.error('Please give your capsule a title');
     if (contentType === 'text' && !textContent.trim()) return toast.error('Please add some text content');
     if (contentType !== 'text' && !mediaFile) return toast.error('Please upload a file');
-    if (ruleType !== 'destroyAfterView' && !ruleValue) return toast.error('Please set the rule value');
+    
+    if (!validateRule()) return;
 
     setLoading(true);
     try {
@@ -292,13 +347,13 @@ const CreatePage = () => {
                   </div>
 
                   <div className="dropzone-container" style={{ position: 'relative' }}>
-                    {/* Recording UI */}
-                    {(contentType === 'voice' || contentType === 'video') && (
+                    {/* Recording/Capture UI */}
+                    {(contentType === 'voice' || contentType === 'video' || contentType === 'image') && (
                       <div className="recorder-section" style={{ marginBottom: 'var(--space-4)' }}>
                         {recordingStatus === 'idle' ? (
                           <button className="btn btn-ghost w-full" style={{ border: '2px dashed var(--color-sand)', padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)' }} onClick={startCamera}>
                             <span style={{ fontSize: '1.5rem', marginRight: 'var(--space-2)' }}>
-                              {contentType === 'voice' ? '🎙️' : '🎬'}
+                              {contentType === 'voice' ? '🎙️' : contentType === 'image' ? '📸' : '🎬'}
                             </span>
                             Enable {contentType === 'voice' ? 'Microphone' : 'Camera'}
                           </button>
@@ -308,29 +363,40 @@ const CreatePage = () => {
                               <div className="flex items-center gap-2">
                                 <div className={`record-dot ${isRecording ? 'pulse' : ''} ${recordingStatus === 'open' ? 'ready' : ''}`} />
                                 <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                                  {recordingStatus === 'open' ? 'Ready to Record' : isRecording ? 'Recording...' : 'Preview Recording'}
+                                  {recordingStatus === 'open' ? 'Ready' : isRecording ? 'Recording...' : 'Preview Capture'}
                                 </span>
                               </div>
-                              <span className="font-mono" style={{ fontSize: '0.9rem', color: 'var(--color-rose)' }}>{formatTime(recordTimer)}</span>
+                              {(contentType === 'video' || contentType === 'voice') && (
+                                <span className="font-mono" style={{ fontSize: '0.9rem', color: 'var(--color-rose)' }}>{formatTime(recordTimer)}</span>
+                              )}
                             </div>
 
                             {/* Live/Preview Displays */}
                             <div style={{ marginBottom: 'var(--space-4)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#000' }}>
-                              {contentType === 'video' && (
-                                <video 
-                                  ref={videoPreviewRef} 
-                                  autoPlay 
-                                  muted={recordingStatus !== 'preview'} 
-                                  controls={recordingStatus === 'preview'}
-                                  src={recordingStatus === 'preview' ? recordedUrl : undefined}
-                                  style={{ 
-                                    width: '100%', 
-                                    display: 'block',
-                                    transform: (recordingStatus === 'recording' || recordingStatus === 'open') ? 'scaleX(-1)' : 'none',
-                                    aspectRatio: '16/9',
-                                    objectFit: 'cover'
-                                  }} 
-                                />
+                              {(contentType === 'video' || contentType === 'image') && (
+                                <>
+                                  {recordingStatus === 'preview' && contentType === 'image' ? (
+                                    <img 
+                                      src={recordedUrl} 
+                                      style={{ width: '100%', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }} 
+                                    />
+                                  ) : (
+                                    <video 
+                                      ref={videoPreviewRef} 
+                                      autoPlay 
+                                      muted={recordingStatus !== 'preview'} 
+                                      controls={recordingStatus === 'preview' && contentType === 'video'}
+                                      src={recordingStatus === 'preview' && contentType === 'video' ? recordedUrl : undefined}
+                                      style={{ 
+                                        width: '100%', 
+                                        display: 'block',
+                                        transform: (recordingStatus === 'recording' || recordingStatus === 'open') ? 'scaleX(-1)' : 'none',
+                                        aspectRatio: '16/9',
+                                        objectFit: 'cover'
+                                      }} 
+                                    />
+                                  )}
+                                </>
                               )}
                               {contentType === 'voice' && recordingStatus === 'preview' && recordedUrl && (
                                 <audio controls src={recordedUrl} style={{ width: '100%', padding: 'var(--space-2)' }} />
@@ -352,14 +418,18 @@ const CreatePage = () => {
                               {recordingStatus === 'open' ? (
                                 <>
                                   <button className="btn btn-ghost w-full" onClick={resetRecording}>Cancel</button>
-                                  <button className="btn btn-primary w-full" onClick={startRecording}>Start Recording</button>
+                                  {contentType === 'image' ? (
+                                    <button className="btn btn-primary w-full" onClick={takePhoto}>Take Photo</button>
+                                  ) : (
+                                    <button className="btn btn-primary w-full" onClick={startRecording}>Start Recording</button>
+                                  )}
                                 </>
                               ) : isRecording ? (
                                 <button className="btn btn-rose w-full" onClick={stopRecording}>Stop Recording</button>
                               ) : (
                                 <>
                                   <button className="btn btn-ghost w-full" onClick={resetRecording}>Retake</button>
-                                  <button className="btn btn-sage w-full" onClick={() => toast.success('Recording saved! Ready to seal.')}>Keep This</button>
+                                  <button className="btn btn-sage w-full" onClick={() => toast.success('Captured! Ready to seal.')}>Keep This</button>
                                 </>
                               )}
                             </div>
@@ -447,7 +517,7 @@ const CreatePage = () => {
 
               <div className="flex gap-3">
                 <button className="btn btn-ghost" onClick={() => setStep(1)}>← Back</button>
-                <button className="btn btn-primary w-full" onClick={() => setStep(3)}>Next: Share Options →</button>
+                <button className="btn btn-primary w-full" onClick={() => validateRule() && setStep(3)}>Next: Share Options →</button>
               </div>
             </div>
           )}

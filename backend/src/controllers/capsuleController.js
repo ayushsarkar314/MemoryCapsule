@@ -80,12 +80,16 @@ const createCapsule = async (req, res) => {
 
     if (ruleType === 'unlockAt') {
       if (!ruleValue) return res.status(400).json({ message: 'Unlock date is required' });
-      rules.unlockAt = new Date(ruleValue);
+      const unlockDate = new Date(ruleValue);
+      if (unlockDate <= new Date()) return res.status(400).json({ message: 'Unlock date must be in the future' });
+      rules.unlockAt = unlockDate;
     } else if (ruleType === 'destroyAfterView') {
       rules.destroyAfterView = true;
     } else if (ruleType === 'expireAt') {
       if (!ruleValue) return res.status(400).json({ message: 'Expiry date is required' });
-      rules.expireAt = new Date(ruleValue);
+      const expireDate = new Date(ruleValue);
+      if (expireDate <= new Date()) return res.status(400).json({ message: 'Expiry date must be in the future' });
+      rules.expireAt = expireDate;
     } else if (ruleType === 'eventName') {
       if (!ruleValue) return res.status(400).json({ message: 'Event name is required' });
       rules.eventName = ruleValue;
