@@ -29,19 +29,6 @@ const VaultPage = () => {
     }
   };
 
-  const fireTriggerEvent = async () => {
-    const eventName = window.prompt("Enter the Event Name to trigger (e.g. GRADUATION):");
-    if (!eventName) return;
-    
-    try {
-      const res = await api.post(`/capsules/trigger/${eventName.toUpperCase()}`);
-      toast.success(res.data.message);
-      fetchVault();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Could not trigger event');
-    }
-  };
-
   useEffect(() => { fetchVault(); }, []);
 
   const { socket } = useSocket();
@@ -75,9 +62,6 @@ const VaultPage = () => {
         <div className="section-header">
           <h2>My Vault</h2>
           <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-            <button className="btn btn-sm" style={{ background: 'var(--color-sand)', color: 'var(--color-text-primary)' }} onClick={fireTriggerEvent}>
-              🎉 Trigger Event
-            </button>
             <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
               ✨ New Capsule
             </button>

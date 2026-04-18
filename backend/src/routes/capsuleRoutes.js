@@ -7,7 +7,6 @@ const {
   getReceivedCapsules,
   viewCapsule,
   deleteCapsule,
-  triggerEvent,
 } = require('../controllers/capsuleController');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -16,7 +15,6 @@ router.get('/vault', protect, getVault);
 router.get('/sent', protect, getSentCapsules);
 router.get('/received', protect, getReceivedCapsules);
 router.post('/', protect, upload.single('media'), createCapsule);
-router.post('/trigger/:eventName', protect, triggerEvent);
 router.get('/:id', protect, viewCapsule);
 router.delete('/:id', protect, deleteCapsule);
 

@@ -75,7 +75,6 @@ const createCapsule = async (req, res) => {
       unlockAt: null,
       destroyAfterView: false,
       expireAt: null,
-      eventName: null,
     };
 
     if (ruleType === 'unlockAt') {
@@ -90,9 +89,6 @@ const createCapsule = async (req, res) => {
       const expireDate = new Date(ruleValue);
       if (expireDate <= new Date()) return res.status(400).json({ message: 'Expiry date must be in the future' });
       rules.expireAt = expireDate;
-    } else if (ruleType === 'eventName') {
-      if (!ruleValue) return res.status(400).json({ message: 'Event name is required' });
-      rules.eventName = ruleValue;
     }
 
     // Handle media
@@ -311,38 +307,4 @@ const deleteCapsule = async (req, res) => {
   }
 };
 
-// @desc    Trigger an event to unlock event-based capsules
-// @route   POST /api/capsules/trigger/:eventName
-// @access  Private
-const triggerEvent = async (req, res) => {
-  try {
-    const { eventName } = req.params;
-    if (!eventName) return res.status(400).json({ message: 'Event name is required' });
-
-    const capsulesToUnlock = await Capsule.find({
-      status: 'LOCKED',
-      creator: req.user._id,
-      'rules.eventName': eventName,
-    });
-
-    for (const capsule of capsulesToUnlock) {
-      capsule.status = 'UNLOCKED';
-      await capsule.save();
-      
-      const io = getIo();
-      if (io) {
-        io.to(capsule.creator.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
-        if (capsule.recipient) {
-          io.to(capsule.recipient.toString()).emit('capsule_status_changed', { capsuleId: capsule._id, status: 'UNLOCKED' });
-        }
-      }
-    }
-
-    res.status(200).json({ message: `Event '${eventName}' triggered. Unlocked ${capsulesToUnlock.length} capsules.` });
-  } catch (err) {
-    console.error('[Capsule] Trigger event error:', err.message);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule, triggerEvent };
+module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule };
