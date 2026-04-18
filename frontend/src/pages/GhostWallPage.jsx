@@ -6,12 +6,12 @@ import toast from 'react-hot-toast';
 import { useCallback } from 'react';
 
 const EXPIRY_OPTIONS = [
-  { label: '1 hour',  value: 1 },
+  { label: '1 hour', value: 1 },
   { label: '6 hours', value: 6 },
   { label: '12 hours', value: 12 },
   { label: '24 hours', value: 24 },
-  { label: '3 days',  value: 72 },
-  { label: '7 days',  value: 168 },
+  { label: '3 days', value: 72 },
+  { label: '7 days', value: 168 },
 ];
 
 const GhostTimer = ({ expiresAt }) => {

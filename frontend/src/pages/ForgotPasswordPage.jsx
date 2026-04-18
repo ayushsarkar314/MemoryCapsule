@@ -28,14 +28,6 @@ const ForgotPasswordPage = () => {
       <div className="auth-card">
         {/* Logo */}
         <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <div style={{
-            width: 64, height: 64,
-            background: 'var(--gradient-amber)',
-            borderRadius: 'var(--radius-xl)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.8rem', margin: '0 auto var(--space-4)',
-            boxShadow: 'var(--shadow-glow)',
-          }}>🔑</div>
           <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Forgot Password</h1>
           <p className="text-muted text-sm">Enter your email and we'll send you a reset link</p>
         </div>

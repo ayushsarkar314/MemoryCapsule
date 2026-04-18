@@ -88,7 +88,7 @@ const FriendsPage = () => {
   return (
     <div className="theme-sky-pink">
       <div className="container page-content">
-      
+
         <h2 style={{ marginBottom: 'var(--space-8)' }}>Friends</h2>
 
         {/* Search */}

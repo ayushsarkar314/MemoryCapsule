@@ -33,14 +33,6 @@ const RegisterPage = () => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <div style={{
-            width: 64, height: 64,
-            background: 'var(--gradient-amber)',
-            borderRadius: 'var(--radius-xl)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.8rem', margin: '0 auto var(--space-4)',
-            boxShadow: 'var(--shadow-glow)',
-          }}>🫙</div>
           <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Create your vault</h1>
           <p className="text-muted text-sm">Capture moments, send them into time</p>
         </div>
