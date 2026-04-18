@@ -448,6 +448,8 @@ a:hover {
   justify-content: center;
   font-size: 1.1rem;
   box-shadow: var(--shadow-sm);
+  color: var(--color-text-primary);
+  transition: none; /* Prevent inherited link hover color */
 }
 
 .navbar-title {

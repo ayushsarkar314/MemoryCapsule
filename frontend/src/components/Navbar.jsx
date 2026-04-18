@@ -3,11 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
-  { to: '/vault',   label: 'My Vault',   shortLabel: 'Vault',   icon: '🫙' },
-  { to: '/create',  label: 'Create',      shortLabel: 'Create',  icon: '✨' },
-  { to: '/shared',  label: 'Shared',      shortLabel: 'Shared',  icon: '💌' },
-  { to: '/friends', label: 'Friends',     shortLabel: 'Friends', icon: '🤝' },
-  { to: '/ghost',   label: 'Ghost Wall',  shortLabel: 'Ghost',   icon: '👻' },
+  { to: '/vault',   label: 'My Vault',   shortLabel: 'Vault',   icon: 'fa-solid fa-box-archive' },
+  { to: '/create',  label: 'Create',      shortLabel: 'Create',  icon: 'fa-solid fa-wand-magic-sparkles' },
+  { to: '/shared',  label: 'Shared',      shortLabel: 'Shared',  icon: 'fa-solid fa-envelope-open-text' },
+  { to: '/friends', label: 'Friends',     shortLabel: 'Friends', icon: 'fa-solid fa-user-group' },
+  { to: '/ghost',   label: 'Ghost Wall',  shortLabel: 'Ghost',   icon: 'fa-solid fa-ghost' },
 ];
 
 const Navbar = () => {
@@ -27,7 +27,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <NavLink to="/vault" className="navbar-brand">
-        <div className="navbar-logo">🫙</div>
+        <div className="navbar-logo"><i className="fa-solid fa-camera-retro"></i></div>
         <span className="navbar-title hide-on-mobile">Memory Capsule</span>
       </NavLink>
 
@@ -38,7 +38,7 @@ const Navbar = () => {
             to={to}
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
-            <span>{icon}</span>
+            <i className={icon}></i>
             {/* Show full label on desktop, short on mobile bottom bar */}
             <span className="hide-on-mobile">{label}</span>
             <span className="show-on-mobile">{shortLabel}</span>
@@ -60,7 +60,7 @@ const Navbar = () => {
         </NavLink>
         <button className="btn btn-ghost btn-sm" onClick={handleLogout} title="Logout" style={{ padding: 'var(--space-2) var(--space-3)', flexShrink: 0 }}>
           <span className="hide-on-mobile">Logout</span>
-          <span className="show-on-mobile" style={{ fontSize: '1.1rem', lineHeight: 1 }}>🚪</span>
+          <span className="show-on-mobile" style={{ fontSize: '1.1rem', lineHeight: 1 }}><i className="fa-solid fa-right-from-bracket"></i></span>
         </button>
       </div>
     </nav>

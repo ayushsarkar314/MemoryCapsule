@@ -6,9 +6,9 @@ import CapsuleCard from '../components/CapsuleCard';
 import { useSocket } from '../context/SocketContext';
 
 const TABS = [
-  { key: 'unlocked',  label: 'Unlocked',  icon: 'fa-solid fa-envelope-open', color: 'var(--color-unlocked)' },
-  { key: 'locked',    label: 'Locked',    icon: 'fa-solid fa-lock', color: 'var(--color-locked)' },
-  { key: 'expired',   label: 'Expired',   icon: 'fa-solid fa-clock-rotate-left', color: 'var(--color-expired)' },
+  { key: 'unlocked', label: 'Unlocked', icon: 'fa-solid fa-envelope-open', color: 'var(--color-unlocked)' },
+  { key: 'locked', label: 'Locked', icon: 'fa-solid fa-lock', color: 'var(--color-locked)' },
+  { key: 'expired', label: 'Expired', icon: 'fa-solid fa-clock-rotate-left', color: 'var(--color-expired)' },
   { key: 'destroyed', label: 'Destroyed', icon: 'fa-solid fa-wind', color: 'var(--color-destroyed)' },
 ];
 
@@ -35,7 +35,7 @@ const VaultPage = () => {
 
   useEffect(() => {
     if (!socket) return;
-    
+
     const handleStatusChanged = (data) => {
       if (data.event) {
         toast.success(`Event '${data.event}' unlocked ${data.count} capsules!`);
@@ -58,11 +58,11 @@ const VaultPage = () => {
     <div className="vault-luminous-layout">
       {/* Immersive Video Background */}
       <div className="video-container-fixed">
-        <video 
-          className="video-full-bg" 
-          autoPlay 
-          loop 
-          muted 
+        <video
+          className="video-full-bg"
+          autoPlay
+          loop
+          muted
           playsInline
           preload="auto"
         >
@@ -74,11 +74,11 @@ const VaultPage = () => {
         <div className="container">
           {/* Visual Header */}
           <div className="vault-hero-text">
-         
+
             <h1>The Vault</h1>
             <div style={{ marginTop: 'var(--space-6)' }}>
-              <button 
-                className="btn btn-primary btn-lg" 
+              <button
+                className="btn btn-primary btn-lg"
                 style={{ background: 'var(--color-brown-mid)', borderColor: 'var(--color-brown-mid)', color: '#fff' }}
                 onClick={() => navigate('/create')}
               >
@@ -103,25 +103,25 @@ const VaultPage = () => {
             {/* Snapshot Row — Clean design without glass effect */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
               {TABS.map(({ key, label, icon }) => (
-                <div 
-                  key={key} 
-                  style={{ 
-                    textAlign: 'center', 
+                <div
+                  key={key}
+                  style={{
+                    textAlign: 'center',
                     padding: 'var(--space-5)',
                     cursor: 'pointer',
                     borderRadius: 'var(--radius-xl)',
-                    background: activeTab === key ? 'var(--color-rose-light)' : 'rgba(251, 223, 223, 0.3)',
-                    border: activeTab === key ? '2px solid var(--color-brown)' : '1px solid rgba(223, 160, 160, 0.4)',
+                    background: activeTab === key ? 'var(--color-rose-light)' : '#F5E1E1',
+                    border: activeTab === key ? '2px solid var(--color-brown)' : '1px solid var(--color-rose-muted)',
                     transition: 'all 0.3s ease',
                     color: activeTab === key ? 'var(--color-text-primary)' : 'var(--color-text-primary)'
-                  }} 
+                  }}
                   onClick={() => setActiveTab(key)}
                 >
-                  <div style={{ fontSize: '1.2rem', marginBottom: 'var(--space-2)', color: activeTab === key ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}>
+                  <div style={{ fontSize: '1.2rem', marginBottom: 'var(--space-2)', color: activeTab === key ? 'var(--color-text-primary)' : '#111', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
                     <i className={icon}></i>
                   </div>
-                  <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brown)' }}>{vault[key]?.length ?? 0}</div>
-                  <div className="text-muted text-xs" style={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, color: 'var(--color-text-muted)' }}>{label}</div>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-brown)', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>{vault[key]?.length ?? 0}</div>
+                  <div className="text-muted text-xs" style={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800, color: activeTab === key ? 'var(--color-text-primary)' : '#111', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>{label}</div>
                 </div>
               ))}
             </div>
