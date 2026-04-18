@@ -6,10 +6,10 @@ import CapsuleCard from '../components/CapsuleCard';
 import { useSocket } from '../context/SocketContext';
 
 const TABS = [
-  { key: 'unlocked',  label: 'Unlocked',  icon: '🔓', color: 'var(--color-unlocked)' },
-  { key: 'locked',    label: 'Locked',    icon: '🔒', color: 'var(--color-locked)' },
-  { key: 'expired',   label: 'Expired',   icon: '⏳', color: 'var(--color-expired)' },
-  { key: 'destroyed', label: 'Destroyed', icon: '💨', color: 'var(--color-destroyed)' },
+  { key: 'unlocked',  label: 'Unlocked',  icon: 'fa-solid fa-envelope-open', color: 'var(--color-unlocked)' },
+  { key: 'locked',    label: 'Locked',    icon: 'fa-solid fa-lock', color: 'var(--color-locked)' },
+  { key: 'expired',   label: 'Expired',   icon: 'fa-solid fa-clock-rotate-left', color: 'var(--color-expired)' },
+  { key: 'destroyed', label: 'Destroyed', icon: 'fa-solid fa-wind', color: 'var(--color-destroyed)' },
 ];
 
 const VaultPage = () => {
@@ -55,69 +55,102 @@ const VaultPage = () => {
   const activeCapsules = vault[activeTab] || [];
 
   return (
-    <div className="container page-content">
-      {/* Header */}
-      <div style={{ marginBottom: 'var(--space-8)' }}>
-        
-        <div className="section-header">
-          <h2>My Vault</h2>
-          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>
-              ✨ New Capsule
-            </button>
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
-          {TABS.map(({ key, label, icon, color }) => (
-            <div key={key} className="card" style={{ flex: '1', minWidth: '120px', textAlign: 'center', padding: 'var(--space-4)', cursor: 'pointer' }} onClick={() => setActiveTab(key)}>
-              <div style={{ fontSize: '1.4rem' }}>{icon}</div>
-              <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', fontWeight: 700, color }}>{vault[key]?.length ?? 0}</div>
-              <div className="text-muted text-xs" style={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="status-tabs">
-          {TABS.map(({ key, label, icon }) => (
-            <button key={key} className={`status-tab ${activeTab === key ? 'active' : ''}`} onClick={() => setActiveTab(key)}>
-              {icon} {label}
-            </button>
-          ))}
-        </div>
+    <div className="vault-luminous-layout">
+      {/* Immersive Video Background */}
+      <div className="video-container-fixed">
+        <video 
+          className="video-full-bg" 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          preload="auto"
+        >
+          <source src="/assets/video/MainVault.mp4" type="video/mp4" />
+        </video>
       </div>
 
-      {/* Content */}
-      {loading ? (
-        <div className="vault-grid">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 180, borderRadius: 'var(--radius-xl)' }} />
-          ))}
+      <div className="vault-luminous-overlay">
+        <div className="container">
+          {/* Visual Header */}
+          <div className="vault-hero-text">
+         
+            <h1>The Vault</h1>
+            <div style={{ marginTop: 'var(--space-6)' }}>
+              <button 
+                className="btn btn-primary btn-lg" 
+                style={{ background: 'var(--color-brown-mid)', borderColor: 'var(--color-brown-mid)', color: '#fff' }}
+                onClick={() => navigate('/create')}
+              >
+                ✨ Preserve a Memory
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content Area — Glassmorphism removed as per request */}
+          <div className="vault-content-minimal">
+            <div className="section-header">
+              <h2 className="text-high-contrast">My Collection</h2>
+              <div className="status-tabs">
+                {TABS.map(({ key, label, icon }) => (
+                  <button key={key} className={`status-tab ${activeTab === key ? 'active' : ''}`} onClick={() => setActiveTab(key)}>
+                    <i className={icon} style={{ marginRight: 'var(--space-2)' }}></i> {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Snapshot Row — Clean design without glass effect */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
+              {TABS.map(({ key, label, icon }) => (
+                <div 
+                  key={key} 
+                  style={{ 
+                    textAlign: 'center', 
+                    padding: 'var(--space-5)',
+                    cursor: 'pointer',
+                    borderRadius: 'var(--radius-xl)',
+                    background: activeTab === key ? 'var(--color-rose-light)' : 'rgba(251, 223, 223, 0.3)',
+                    border: activeTab === key ? '2px solid var(--color-brown)' : '1px solid rgba(223, 160, 160, 0.4)',
+                    transition: 'all 0.3s ease',
+                    color: activeTab === key ? 'var(--color-text-primary)' : 'var(--color-text-primary)'
+                  }} 
+                  onClick={() => setActiveTab(key)}
+                >
+                  <div style={{ fontSize: '1.2rem', marginBottom: 'var(--space-2)', color: activeTab === key ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}>
+                    <i className={icon}></i>
+                  </div>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brown)' }}>{vault[key]?.length ?? 0}</div>
+                  <div className="text-muted text-xs" style={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, color: 'var(--color-text-muted)' }}>{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Grid display */}
+            <div style={{ minHeight: '400px' }}>
+              {loading ? (
+                <div className="vault-grid">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="skeleton" style={{ height: 240, borderRadius: 'var(--radius-xl)', background: 'rgba(251, 223, 223, 0.4)' }} />
+                  ))}
+                </div>
+              ) : activeCapsules.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-16) 0' }}>
+                  <div style={{ fontSize: '4rem', opacity: 0.3, marginBottom: 'var(--space-4)', color: 'var(--color-rose)' }}>✈️</div>
+                  <h3 className="text-high-contrast">No {activeTab} travel moments yet</h3>
+                  <p className="text-muted">Every mile has a story. Seal yours today.</p>
+                </div>
+              ) : (
+                <div className="vault-grid">
+                  {activeCapsules.map((capsule) => (
+                    <CapsuleCard key={capsule._id} capsule={capsule} onClick={() => navigate(`/capsule/${capsule._id}`)} onRefresh={fetchVault} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      ) : activeCapsules.length === 0 ? (
-        <div className="vault-empty">
-          <div className="vault-empty-icon">{TABS.find(t => t.key === activeTab)?.icon}</div>
-          <h3 style={{ marginBottom: 'var(--space-2)' }}>No {activeTab} capsules yet</h3>
-          {activeTab === 'unlocked' || activeTab === 'locked' ? (
-            <p style={{ marginBottom: 'var(--space-5)' }}>
-              {activeTab === 'locked' ? 'Capsules you seal for the future will appear here.' : 'Open capsules will show up here.'}
-            </p>
-          ) : null}
-          {(activeTab === 'unlocked' || activeTab === 'locked') && (
-            <button className="btn btn-primary" onClick={() => navigate('/create')}>
-              Create your first capsule
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="vault-grid">
-          {activeCapsules.map((capsule) => (
-            <CapsuleCard key={capsule._id} capsule={capsule} onClick={() => navigate(`/capsule/${capsule._id}`)} onRefresh={fetchVault} />
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

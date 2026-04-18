@@ -7,7 +7,7 @@ import CapsuleCard from '../components/CapsuleCard';
 
 const TABS = [
   { key: 'received', label: 'Received', icon: '📬' },
-  { key: 'sent',     label: 'Sent',     icon: '📤' },
+  { key: 'sent', label: 'Sent', icon: '📤' },
 ];
 
 const SharedPage = () => {
@@ -38,7 +38,7 @@ const SharedPage = () => {
 
   return (
     <div className="container page-content">
-      
+
       <div className="section-header" style={{ marginBottom: 'var(--space-6)' }}>
         <h2>Shared Capsules</h2>
         <button className="btn btn-primary btn-sm" onClick={() => navigate('/create')}>

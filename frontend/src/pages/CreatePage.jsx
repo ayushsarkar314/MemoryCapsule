@@ -6,28 +6,28 @@ import toast from 'react-hot-toast';
 import FriendPickerModal from '../components/FriendPickerModal';
 
 const CONTENT_TYPES = [
-  { key: 'text',  icon: '📝', label: 'Text' },
-  { key: 'image', icon: '🖼️', label: 'Image' },
-  { key: 'voice', icon: '🎙️', label: 'Voice' },
-  { key: 'video', icon: '🎬', label: 'Video' },
+  { key: 'text', icon: 'fa-solid fa-file-signature', label: 'Text' },
+  { key: 'image', icon: 'fa-solid fa-image', label: 'Image' },
+  { key: 'voice', icon: 'fa-solid fa-microphone-lines', label: 'Voice' },
+  { key: 'video', icon: 'fa-solid fa-video', label: 'Video' },
 ];
 
 const RULES = [
   {
     key: 'unlockAt',
-    icon: '⏰',
+    icon: 'fa-solid fa-unlock-keyhole',
     title: 'Unlock at a future time',
     desc: 'Capsule stays sealed until the date you set.',
   },
   {
     key: 'destroyAfterView',
-    icon: '💣',
+    icon: 'fa-solid fa-bomb',
     title: 'Destroy after one view',
     desc: 'Opens once, then it\'s gone forever.',
   },
   {
     key: 'expireAt',
-    icon: '⌛',
+    icon: 'fa-solid fa-hourglass-end',
     title: 'Auto-expire on a date',
     desc: 'Content disappears on schedule.',
   },
@@ -101,7 +101,7 @@ const CreatePage = () => {
         audio: contentType !== 'image',
         video: contentType === 'video' || contentType === 'image'
       };
-      
+
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       setRecordingStatus('open');
@@ -128,11 +128,11 @@ const CreatePage = () => {
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
       setRecordedUrl(url);
-      
+
       const file = new File([blob], `captured-${Date.now()}.jpg`, { type: 'image/jpeg' });
       setMediaFile(file);
       setRecordingStatus('preview');
-      
+
       // Stop camera
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -148,7 +148,7 @@ const CreatePage = () => {
       const recorder = new MediaRecorder(streamRef.current, {
         mimeType: contentType === 'video' ? 'video/webm' : 'audio/webm'
       });
-      
+
       mediaRecorderRef.current = recorder;
       const localChunks = [];
 
@@ -157,12 +157,12 @@ const CreatePage = () => {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(localChunks, { 
-          type: contentType === 'video' ? 'video/webm' : 'audio/webm' 
+        const blob = new Blob(localChunks, {
+          type: contentType === 'video' ? 'video/webm' : 'audio/webm'
         });
         const url = URL.createObjectURL(blob);
         setRecordedUrl(url);
-        
+
         // Convert Blob to File for submission
         const extension = 'webm';
         const file = new File([blob], `recorded-${Date.now()}.${extension}`, {
@@ -186,7 +186,7 @@ const CreatePage = () => {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setRecordingStatus('preview');
-      
+
       if (videoPreviewRef.current) {
         videoPreviewRef.current.srcObject = null;
       }
@@ -212,14 +212,14 @@ const CreatePage = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: contentType === 'image' ? { 'image/*': [] }
-          : contentType === 'voice' ? { 'audio/*': [] }
-          : { 'video/*': [] },
+      : contentType === 'voice' ? { 'audio/*': [] }
+        : { 'video/*': [] },
     maxFiles: 1,
   });
 
   const validateRule = () => {
     if (ruleType === 'destroyAfterView') return true;
-    
+
     if (!ruleValue) {
       toast.error(`Please set the ${ruleType === 'unlockAt' ? 'unlock' : 'expiry'} date`);
       return false;
@@ -238,7 +238,7 @@ const CreatePage = () => {
     if (!title.trim()) return toast.error('Please give your capsule a title');
     if (contentType === 'text' && !textContent.trim()) return toast.error('Please add some text content');
     if (contentType !== 'text' && !mediaFile) return toast.error('Please upload a file');
-    
+
     if (!validateRule()) return;
 
     setLoading(true);
@@ -253,10 +253,10 @@ const CreatePage = () => {
       if (recipientId) formData.append('recipientId', recipientId);
 
       await api.post('/capsules', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      
+
       // Trigger success animation
       setShowSuccess(true);
-      
+
       // Wait for animation to finish before navigating
       setTimeout(() => {
         toast.success('Capsule sealed! ✨');
@@ -272,31 +272,38 @@ const CreatePage = () => {
   const minDate = new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16);
 
   return (
-    <div className="container page-content">
-      <div className="create-page">
-       
-        <h2 style={{ marginBottom: 'var(--space-8)' }}>Create a Capsule</h2>
+    <div className="create-forest-layout">
+      <div className="container">
+        <h1 className="forest-title">Create a Capsule</h1>
 
         {/* Step indicators */}
-        <div className="flex items-center gap-2" style={{ marginBottom: 'var(--space-8)', justifyContent: 'center' }}>
+        <div className="forest-step-indicator">
           {['Content', 'Rules', 'Share'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2" style={{ flexShrink: 1 }}>
-              <div className="flex items-center gap-2">
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%',
-                  color: step >= i + 1 ? '#fff' : 'var(--color-text-muted)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.8rem', fontWeight: 700, flexShrink: 0,
-                  background: step > i + 1 ? '#8FA88A' : step === i + 1 ? '#D4845A' : '#E8DDD0',
-                }}>{step > i + 1 ? '✓' : i + 1}</div>
-                <span style={{ fontSize: '0.875rem', fontWeight: step === i + 1 ? 600 : 400, color: step === i + 1 ? 'var(--color-text-primary)' : 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{s}</span>
+            <div key={s} className="flex items-center gap-2">
+              <div className={`forest-step-dot ${step === i + 1 ? 'active' : step > i + 1 ? 'completed' : 'pending'}`}>
+                {step > i + 1 ? '✓' : i + 1}
               </div>
-              {i < 2 && <div style={{ flexShrink: 1, minWidth: 8, height: 1, background: step > i + 1 ? 'var(--color-sage)' : 'var(--color-sand)', width: 32 }} />}
+              <span style={{
+                fontSize: '0.85rem',
+                fontWeight: step === i + 1 ? 700 : 500,
+                color: step === i + 1 ? 'var(--color-sunbeam)' : 'rgba(255,255,255,0.6)',
+                letterSpacing: '0.02em'
+              }}>
+                {s}
+              </span>
+              {i < 2 && (
+                <div style={{
+                  width: 30,
+                  height: 2,
+                  background: step > i + 1 ? '#fff' : 'rgba(255,255,255,0.2)',
+                  borderRadius: 1
+                }} />
+              )}
             </div>
           ))}
         </div>
 
-        <div className="card-glass" style={{ padding: 'var(--space-8)' }}>
+        <div className="mossy-panel">
 
           {/* STEP 1: Content */}
           {step === 1 && (
@@ -313,7 +320,7 @@ const CreatePage = () => {
                 <div className="content-type-grid">
                   {CONTENT_TYPES.map(({ key, icon, label }) => (
                     <button key={key} className={`content-type-btn ${contentType === key ? 'selected' : ''}`} onClick={() => { setContentType(key); setMediaFile(null); }}>
-                      <span className="icon">{icon}</span>
+                      <span className="icon"><i className={icon}></i></span>
                       <span>{label}</span>
                     </button>
                   ))}
@@ -338,13 +345,11 @@ const CreatePage = () => {
                       <div className="recorder-section" style={{ marginBottom: 'var(--space-4)' }}>
                         {recordingStatus === 'idle' ? (
                           <button className="btn btn-ghost w-full" style={{ border: '2px dashed var(--color-sand)', padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)' }} onClick={startCamera}>
-                            <span style={{ fontSize: '1.5rem', marginRight: 'var(--space-2)' }}>
-                              {contentType === 'voice' ? '🎙️' : contentType === 'image' ? '📸' : '🎬'}
-                            </span>
+                            <i className={contentType === 'voice' ? 'fa-solid fa-microphone-lines' : contentType === 'image' ? 'fa-solid fa-camera' : 'fa-solid fa-video'} style={{ fontSize: '1.5rem', marginRight: 'var(--space-2)' }}></i>
                             Enable {contentType === 'voice' ? 'Microphone' : 'Camera'}
                           </button>
                         ) : (
-                          <div className="recorder-active card-glass" style={{ padding: 'var(--space-4)', border: '1px solid var(--color-sage)' }}>
+                          <div className="recorder-active" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                             <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
                               <div className="flex items-center gap-2">
                                 <div className={`record-dot ${isRecording ? 'pulse' : ''} ${recordingStatus === 'open' ? 'ready' : ''}`} />
@@ -362,24 +367,24 @@ const CreatePage = () => {
                               {(contentType === 'video' || contentType === 'image') && (
                                 <>
                                   {recordingStatus === 'preview' && contentType === 'image' ? (
-                                    <img 
-                                      src={recordedUrl} 
-                                      style={{ width: '100%', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }} 
+                                    <img
+                                      src={recordedUrl}
+                                      style={{ width: '100%', display: 'block', aspectRatio: '16/9', objectFit: 'cover' }}
                                     />
                                   ) : (
-                                    <video 
-                                      ref={videoPreviewRef} 
-                                      autoPlay 
-                                      muted={recordingStatus !== 'preview'} 
+                                    <video
+                                      ref={videoPreviewRef}
+                                      autoPlay
+                                      muted={recordingStatus !== 'preview'}
                                       controls={recordingStatus === 'preview' && contentType === 'video'}
                                       src={recordingStatus === 'preview' && contentType === 'video' ? recordedUrl : undefined}
-                                      style={{ 
-                                        width: '100%', 
+                                      style={{
+                                        width: '100%',
                                         display: 'block',
                                         transform: (recordingStatus === 'recording' || recordingStatus === 'open') ? 'scaleX(-1)' : 'none',
                                         aspectRatio: '16/9',
                                         objectFit: 'cover'
-                                      }} 
+                                      }}
                                     />
                                   )}
                                 </>
@@ -463,7 +468,7 @@ const CreatePage = () => {
               <div className="rule-selector" style={{ marginBottom: 'var(--space-6)' }}>
                 {RULES.map(({ key, icon, title: rTitle, desc }) => (
                   <div key={key} className={`rule-option ${ruleType === key ? 'selected' : ''}`} onClick={() => { setRuleType(key); setRuleValue(''); }}>
-                    <span className="rule-option-icon">{icon}</span>
+                    <span className="rule-option-icon"><i className={icon}></i></span>
                     <div>
                       <p className="rule-option-title">{rTitle}</p>
                       <p className="rule-option-desc">{desc}</p>
@@ -511,17 +516,17 @@ const CreatePage = () => {
 
               <div className="flex flex-col gap-3" style={{ marginBottom: 'var(--space-6)' }}>
                 <div className={`rule-option ${!recipientId ? 'selected' : ''}`} onClick={() => { setRecipientId(''); setRecipientName(''); }}>
-                  <span className="rule-option-icon">🫙</span>
+                  <span className="rule-option-icon"><i className="fa-solid fa-vault"></i></span>
                   <div>
                     <p className="rule-option-title">Keep in my vault</p>
                     <p className="rule-option-desc">Private, only for you.</p>
                   </div>
                 </div>
                 <div className={`rule-option ${recipientId ? 'selected' : ''}`} onClick={() => setShowFriendPicker(true)}>
-                  <span className="rule-option-icon">💌</span>
+                  <span className="rule-option-icon"><i className="fa-solid fa-paper-plane"></i></span>
                   <div>
                     <p className="rule-option-title">
-                      Send to a friend {recipientId && <span style={{ color: 'var(--color-amber)' }}>→ {recipientName}</span>}
+                      Send to a friend {recipientId && <span style={{ color: 'var(--color-sunbeam)' }}>→ {recipientName}</span>}
                     </p>
                     <p className="rule-option-desc">Delivered to their received capsules.</p>
                   </div>

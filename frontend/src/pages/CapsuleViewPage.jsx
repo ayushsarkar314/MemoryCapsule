@@ -156,7 +156,7 @@ const CapsuleViewPage = () => {
               )}
 
               {contentType === 'voice' && mediaUrl && (
-                <div style={{ padding: 'var(--space-6)', background: 'rgba(138,164,184,0.1)', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+                <div style={{ padding: 'var(--space-6)', background: 'rgba(223, 160, 160, 0.15)', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid rgba(223, 160, 160, 0.2)' }}>
                   <p style={{ fontSize: '2rem', marginBottom: 'var(--space-4)' }}>🎙️</p>
                   <audio controls src={mediaUrl} style={{ width: '100%' }} />
                 </div>

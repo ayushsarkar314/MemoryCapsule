@@ -2,7 +2,12 @@ import { formatDistanceToNow, format, isPast } from 'date-fns';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
-const CONTENT_ICONS = { text: '📝', image: '🖼️', voice: '🎙️', video: '🎬' };
+const CONTENT_ICONS = { 
+  text: 'fa-solid fa-file-signature', 
+  image: 'fa-solid fa-image', 
+  voice: 'fa-solid fa-microphone-lines', 
+  video: 'fa-solid fa-video' 
+};
 const CONTENT_CLASSES = { text: 'type-text', image: 'type-image', voice: 'type-voice', video: 'type-video' };
 
 const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
@@ -42,8 +47,13 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
         <h4 style={{ fontSize: '1rem', fontFamily: 'var(--font-serif)', fontWeight: 600, lineHeight: 1.3, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {title}
         </h4>
-        <span className={`capsule-status-badge badge-${statusLower}`} style={{ flexShrink: 0 }}>
-          {isLocked ? '🔒' : status === 'UNLOCKED' ? '🔓' : status === 'EXPIRED' ? '⏳' : '💨'}
+        <span className={`capsule-status-badge badge-${statusLower}`} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <i className={
+            isLocked ? 'fa-solid fa-lock' : 
+            status === 'UNLOCKED' ? 'fa-solid fa-envelope-open' : 
+            status === 'EXPIRED' ? 'fa-solid fa-clock-rotate-left' : 
+            'fa-solid fa-wind'
+          }></i>
           {' '}{status}
         </span>
       </div>
@@ -51,18 +61,22 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
       {/* Rule info */}
       <div style={{ marginBottom: 'var(--space-4)' }}>
         {rules?.destroyAfterView && (
-          <p className="text-xs text-muted">💣 Destroys after one view</p>
+          <p className="text-xs text-muted">
+            <i className="fa-solid fa-bomb" style={{ marginRight: '6px' }}></i> Destroys after one view
+          </p>
         )}
         {unlockDate && (
           <p className="text-xs text-muted">
+            <i className={isLocked && !isPast(unlockDate) ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'} style={{ marginRight: '6px' }}></i>
             {isLocked && !isPast(unlockDate)
-              ? `🔒 Unlocks ${formatDistanceToNow(unlockDate, { addSuffix: true })}`
-              : `🔓 Unlocked ${formatDistanceToNow(unlockDate, { addSuffix: true })}`}
+              ? `Unlocks ${formatDistanceToNow(unlockDate, { addSuffix: true })}`
+              : `Unlocked ${formatDistanceToNow(unlockDate, { addSuffix: true })}`}
           </p>
         )}
         {expireDate && (
           <p className="text-xs text-muted">
-            ⏳ {isPast(expireDate) ? 'Expired' : `Expires`} {formatDistanceToNow(expireDate, { addSuffix: true })}
+            <i className="fa-solid fa-hourglass-half" style={{ marginRight: '6px' }}></i>
+            {isPast(expireDate) ? 'Expired' : `Expires`} {formatDistanceToNow(expireDate, { addSuffix: true })}
           </p>
         )}
       </div>
