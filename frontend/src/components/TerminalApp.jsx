@@ -6,9 +6,18 @@ import TerminalLine from './TerminalLine';
 import InputRow from './InputRow';
 import StatusBar from './StatusBar';
 
-export default function TerminalApp() {
-  const { lines, auth, user, createStep, busy, run } = useTerminal();
+export default function TerminalApp({ onExit }) {
+  const { lines, auth, user, createStep, busy, run, exitRequested, resetExit, loginTime } = useTerminal();
   const screenRef = useRef(null);
+
+  // Trigger onExit callback when exit command is typed
+  useEffect(() => {
+    if (exitRequested && onExit) {
+      resetExit();
+      onExit();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exitRequested]);
 
   useEffect(() => {
     if (screenRef.current) {
@@ -43,7 +52,7 @@ export default function TerminalApp() {
       </div>
 
       <InputRow auth={auth} user={user} busy={busy} onSubmit={run} />
-      <StatusBar createStep={createStep} busy={busy} />
+      <StatusBar createStep={createStep} busy={busy} auth={auth} user={user} loginTime={loginTime} />
     </div>
   );
 }

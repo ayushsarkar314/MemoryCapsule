@@ -90,6 +90,7 @@ export const COMMANDS = {
   'vault stats':   'Personal vault summary',
   'whoami':        'Show current session info',
   logout:          'Lock vault and end session',
+  exit:            'Close terminal mode',
   clear:           'Clear terminal output',
 };
 

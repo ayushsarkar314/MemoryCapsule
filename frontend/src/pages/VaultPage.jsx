@@ -37,13 +37,7 @@ const VaultPage = () => {
   if (isTerminalMode) {
     return (
       <div className="terminal-theme-wrapper">
-        <button 
-          className="btn btn-secondary theme-toggle-btn"
-          onClick={() => setIsTerminalMode(false)}
-        >
-          Exit Terminal Mode
-        </button>
-        <TerminalApp />
+        <TerminalApp onExit={() => setIsTerminalMode(false)} />
       </div>
     );
   }

@@ -11,8 +11,17 @@ const LandingPage = () => {
   const navigate = useNavigate();
   
   // Terminal Logic
-  const { lines, auth, user, createStep, busy, run } = useTerminal();
+  const { lines, auth, user, createStep, busy, run, exitRequested, resetExit, loginTime } = useTerminal();
   const terminalEndRef = useRef(null);
+
+  // Close terminal when exit command is typed
+  useEffect(() => {
+    if (exitRequested) {
+      setIsTerminalMode(false);
+      resetExit();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exitRequested]);
 
   useEffect(() => {
     if (isTerminalMode && terminalEndRef.current) {
@@ -26,12 +35,6 @@ const LandingPage = () => {
         className="terminal-theme-wrapper"
         style={{ animation: 'flicker 12s ease-in-out infinite' }}
       >
-        <button 
-          className="btn btn-secondary theme-toggle-btn"
-          onClick={() => setIsTerminalMode(false)}
-        >
-          Exit Terminal Mode
-        </button>
         <div className="terminal-container">
           <TopBar auth={auth} user={user} />
           
@@ -60,7 +63,7 @@ const LandingPage = () => {
           </div>
 
           <InputRow auth={auth} user={user} busy={busy} onSubmit={run} />
-          <StatusBar createStep={createStep} busy={busy} />
+          <StatusBar createStep={createStep} busy={busy} auth={auth} user={user} loginTime={loginTime} />
         </div>
       </div>
     );

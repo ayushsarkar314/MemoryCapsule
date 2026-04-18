@@ -49,6 +49,8 @@ export function useTerminal() {
   const [createStep, setCreateStep] = useState(0);
   const [newCap, setNewCap]       = useState({});
   const [busy, setBusy]           = useState(false);
+  const [exitRequested, setExitRequested] = useState(false);
+  const [loginTime, setLoginTime]  = useState(null);
 
   // Append one or more lines
   const push = useCallback((...newLines) => {
@@ -150,7 +152,19 @@ export function useTerminal() {
       );
       setAuth(true);
       setUser(uname);
+      setLoginTime(new Date());
       setBusy(false);
+      return;
+    }
+
+    // ── EXIT TERMINAL MODE ────────────────────────────────────
+    if (cmd === 'exit') {
+      push(
+        line('[SYS] Closing terminal mode...', 'amber'),
+        line('', 'empty'),
+      );
+      setBusy(false);
+      setTimeout(() => setExitRequested(true), 400);
       return;
     }
 
@@ -162,7 +176,7 @@ export function useTerminal() {
     }
 
     // ── LOGOUT ────────────────────────────────────────────────
-    if (cmd === 'logout' || cmd === 'exit') {
+    if (cmd === 'logout') {
       push(
         line('[AUTH] Locking vault...', 'amber'),
         line('[AUTH] Session terminated. Goodbye.', 'amber'),
@@ -170,18 +184,29 @@ export function useTerminal() {
       );
       setAuth(false);
       setUser(null);
+      setLoginTime(null);
       setBusy(false);
       return;
     }
 
     // ── WHOAMI ────────────────────────────────────────────────
     if (cmd === 'whoami') {
+      const sessionDuration = loginTime
+        ? (() => {
+            const diff = Math.floor((new Date() - loginTime) / 1000);
+            const m = Math.floor(diff / 60);
+            const s = diff % 60;
+            return m > 0 ? `${m}m ${s}s` : `${s}s`;
+          })()
+        : 'N/A';
       push(
         line('', 'empty'),
-        line(`User    : ${user}`, 'white'),
-        line(`Session : ACTIVE`, 'green'),
-        line(`Capsules: ${capsules.length} total`, 'white'),
-        line(`Vault   : DECRYPTED`, 'green'),
+        line(`User     : ${user}`, 'white'),
+        line(`Session  : ACTIVE`, 'green'),
+        line(`Logged in: ${loginTime ? loginTime.toLocaleTimeString() : 'N/A'}`, 'white'),
+        line(`Duration : ${sessionDuration}`, 'white'),
+        line(`Capsules : ${capsules.length} total`, 'white'),
+        line(`Vault    : DECRYPTED`, 'green'),
         line('', 'empty'),
       );
       setBusy(false);
@@ -501,5 +526,8 @@ export function useTerminal() {
     createStep,
     busy,
     run,
+    exitRequested,
+    resetExit: () => setExitRequested(false),
+    loginTime,
   };
 }
