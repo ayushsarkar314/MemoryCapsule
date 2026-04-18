@@ -33,6 +33,18 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
     }
   };
 
+  const handleTrigger = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm(`Trigger event '${rules.eventName}' and unlock this capsule now?`)) return;
+    try {
+      await api.post(`/capsules/${_id}/trigger`);
+      toast.success(`🏁 Event '${rules.eventName}' triggered! Capsule unlocked.`);
+      onRefresh && onRefresh();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not trigger event');
+    }
+  };
+
   return (
     <div 
       className={`capsule-card ${statusLower}`} 
@@ -79,6 +91,17 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
             {isPast(expireDate) ? 'Expired' : `Expires`} {formatDistanceToNow(expireDate, { addSuffix: true })}
           </p>
         )}
+        {rules?.eventName && (
+          <p className="text-xs" style={{ color: '#8e44ad', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <i className="fa-solid fa-flag-checkered"></i>
+            Event: {rules.eventName}
+            {rules.eventTriggerDate && (
+              <span style={{ fontWeight: 400, opacity: 0.7, marginLeft: 4 }}>
+                · auto {formatDistanceToNow(new Date(rules.eventTriggerDate), { addSuffix: true })}
+              </span>
+            )}
+          </p>
+        )}
       </div>
 
       {/* Recipient/sender */}
@@ -88,18 +111,31 @@ const CapsuleCard = ({ capsule, onClick, onRefresh }) => {
         </p>
       )}
 
-      {/* Footer: date + delete */}
-      <div className="flex items-center justify-between" style={{ marginTop: 'auto', paddingTop: 'var(--space-3)', borderTop: '1px solid rgba(212,196,176,0.3)' }}>
+      {/* Footer: date + actions */}
+      <div className="flex items-center justify-between" style={{ marginTop: 'auto', paddingTop: 'var(--space-3)', borderTop: '1px solid rgba(212,196,176,0.3)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
         <span className="text-xs text-muted">
           {format(new Date(createdAt), 'MMM d, yyyy')}
         </span>
-        {['LOCKED', 'UNLOCKED'].includes(status) && onRefresh && (
-          <button className="btn btn-ghost btn-sm"
-            style={{ fontSize: '0.75rem', padding: '4px 10px', color: 'var(--color-rose)' }}
-            onClick={handleDelete}>
-            Delete
-          </button>
-        )}
+        <div className="flex gap-2">
+          {/* Trigger button: only for LOCKED event-based capsules */}
+          {status === 'LOCKED' && rules?.eventName && onRefresh && (
+            <button
+              className="btn btn-sm"
+              style={{ fontSize: '0.72rem', padding: '4px 10px', background: 'linear-gradient(135deg,#8e44ad,#6c3483)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 600 }}
+              onClick={handleTrigger}
+              id={`trigger-event-${_id}`}
+            >
+              🏁 Trigger
+            </button>
+          )}
+          {['LOCKED', 'UNLOCKED'].includes(status) && onRefresh && (
+            <button className="btn btn-ghost btn-sm"
+              style={{ fontSize: '0.75rem', padding: '4px 10px', color: 'var(--color-rose)' }}
+              onClick={handleDelete}>
+              Delete
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

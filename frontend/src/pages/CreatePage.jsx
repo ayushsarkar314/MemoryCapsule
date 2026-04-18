@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import FriendPickerModal from '../components/FriendPickerModal';
+import AISuggestPanel from '../components/AISuggestPanel';
 
 const CONTENT_TYPES = [
   { key: 'text', icon: 'fa-solid fa-file-signature', label: 'Text' },
@@ -31,6 +32,12 @@ const RULES = [
     title: 'Auto-expire on a date',
     desc: 'Content disappears on schedule.',
   },
+  {
+    key: 'eventName',
+    icon: 'fa-solid fa-flag-checkered',
+    title: 'Unlock on an event',
+    desc: 'Stays locked until you (or a date) triggers it.',
+  },
 ];
 
 const CreatePage = () => {
@@ -42,6 +49,9 @@ const CreatePage = () => {
   const [mediaFile, setMediaFile] = useState(null);
   const [ruleType, setRuleType] = useState('unlockAt');
   const [ruleValue, setRuleValue] = useState('');
+  // Event rule specific
+  const [eventName, setEventName] = useState('');
+  const [eventTriggerDate, setEventTriggerDate] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [showFriendPicker, setShowFriendPicker] = useState(false);
@@ -220,6 +230,21 @@ const CreatePage = () => {
   const validateRule = () => {
     if (ruleType === 'destroyAfterView') return true;
 
+    if (ruleType === 'eventName') {
+      if (!eventName.trim()) {
+        toast.error('Please enter an event name (e.g. Graduation, Birthday)');
+        return false;
+      }
+      if (eventTriggerDate) {
+        const selectedDate = new Date(eventTriggerDate);
+        if (isNaN(selectedDate.getTime()) || selectedDate <= new Date()) {
+          toast.error('Auto-trigger date must be in the future');
+          return false;
+        }
+      }
+      return true;
+    }
+
     if (!ruleValue) {
       toast.error(`Please set the ${ruleType === 'unlockAt' ? 'unlock' : 'expiry'} date`);
       return false;
@@ -250,6 +275,11 @@ const CreatePage = () => {
       if (mediaFile) formData.append('media', mediaFile);
       formData.append('ruleType', ruleType);
       if (ruleValue) formData.append('ruleValue', ruleValue);
+      // Event rule fields
+      if (ruleType === 'eventName') {
+        formData.append('eventName', eventName.trim().toUpperCase());
+        if (eventTriggerDate) formData.append('eventTriggerDate', eventTriggerDate);
+      }
       if (recipientId) formData.append('recipientId', recipientId);
 
       await api.post('/capsules', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -269,12 +299,29 @@ const CreatePage = () => {
     }
   };
 
+  // Called when user picks an AI suggestion
+  const handleAISuggestion = (suggestion) => {
+    if (suggestion.title) setTitle(suggestion.title);
+    if (suggestion.contentType) setContentType(suggestion.contentType);
+    if (suggestion.suggestedRule) {
+      setRuleType(suggestion.suggestedRule);
+      setRuleValue('');
+      setEventName('');
+      setEventTriggerDate('');
+    }
+    // Move to next step so user sees context
+    setStep(1);
+  };
+
   const minDate = new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16);
 
   return (
     <div className="create-forest-layout">
       <div className="container">
         <h1 className="forest-title">Create a Capsule</h1>
+
+        {/* AI Suggest Panel — appears above the steps */}
+        <AISuggestPanel onUseSuggestion={handleAISuggestion} />
 
         {/* Step indicators */}
         <div className="forest-step-indicator">
@@ -496,6 +543,34 @@ const CreatePage = () => {
                   <p className="text-sm" style={{ color: 'var(--color-rose)' }}>
                     ⚠️ This capsule will be permanently destroyed the moment it's opened. This cannot be undone.
                   </p>
+                </div>
+              )}
+
+              {ruleType === 'eventName' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  <div className="form-group">
+                    <label className="form-label">Event Name</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. GRADUATION, BIRTHDAY, NEW_JOB…"
+                      value={eventName}
+                      onChange={(e) => setEventName(e.target.value.toUpperCase())}
+                      id="event-name-input"
+                    />
+                    <p className="text-xs text-muted" style={{ marginTop: 'var(--space-1)' }}>You can manually trigger this capsule anytime from your vault.</p>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Auto-trigger Date <span style={{ opacity: 0.6, fontWeight: 400 }}>(optional)</span></label>
+                    <input
+                      type="datetime-local"
+                      className="form-input"
+                      min={minDate}
+                      value={eventTriggerDate}
+                      onChange={(e) => setEventTriggerDate(e.target.value)}
+                      id="event-trigger-date-input"
+                    />
+                    <p className="text-xs text-muted" style={{ marginTop: 'var(--space-1)' }}>If set, capsule auto-unlocks on this date even if you haven't triggered it manually.</p>
+                  </div>
                 </div>
               )}
 

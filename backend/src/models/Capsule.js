@@ -40,10 +40,11 @@ const capsuleSchema = new mongoose.Schema(
     },
     // Lifecycle RULES (exactly one should be set)
     rules: {
-      unlockAt: { type: Date, default: null },       // Unlock at a future date
+      unlockAt: { type: Date, default: null },            // Unlock at a future date
       destroyAfterView: { type: Boolean, default: false }, // Destroy after single view
-      expireAt: { type: Date, default: null },        // Auto-expire at a date
-      eventName: { type: String, default: null },     // Event-based trigger (e.g. "GRADUATION")
+      expireAt: { type: Date, default: null },             // Auto-expire at a date
+      eventName: { type: String, default: null },          // Event-based trigger label (e.g. "GRADUATION")
+      eventTriggerDate: { type: Date, default: null },     // Hybrid: auto-unlock on this date if not manually triggered
     },
     // For shared capsules: recipient user
     recipient: {

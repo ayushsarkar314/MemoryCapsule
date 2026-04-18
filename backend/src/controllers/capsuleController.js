@@ -89,6 +89,20 @@ const createCapsule = async (req, res) => {
       const expireDate = new Date(ruleValue);
       if (expireDate <= new Date()) return res.status(400).json({ message: 'Expiry date must be in the future' });
       rules.expireAt = expireDate;
+    } else if (ruleType === 'eventName') {
+      // ruleValue = JSON string: { eventName: string, eventTriggerDate?: string }
+      const { eventName, eventTriggerDate } = req.body;
+      if (!eventName || !eventName.trim()) {
+        return res.status(400).json({ message: 'Event name is required' });
+      }
+      rules.eventName = eventName.trim().toUpperCase();
+      if (eventTriggerDate) {
+        const triggerDate = new Date(eventTriggerDate);
+        if (triggerDate <= new Date()) {
+          return res.status(400).json({ message: 'Event trigger date must be in the future' });
+        }
+        rules.eventTriggerDate = triggerDate;
+      }
     }
 
     // Handle media
@@ -106,6 +120,7 @@ const createCapsule = async (req, res) => {
     let initialStatus = 'LOCKED';
     if (ruleType === 'destroyAfterView') initialStatus = 'UNLOCKED';
     if (ruleType === 'expireAt') initialStatus = 'UNLOCKED';
+    // eventName capsules always start LOCKED — waiting for manual trigger or date trigger
 
     const capsule = await Capsule.create({
       creator: req.user._id,
@@ -307,4 +322,54 @@ const deleteCapsule = async (req, res) => {
   }
 };
 
-module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule };
+// @desc    Manually trigger an event-based capsule (unlocks it)
+// @route   POST /api/capsules/:id/trigger
+// @access  Private
+const triggerEventCapsule = async (req, res) => {
+  try {
+    const capsule = await Capsule.findById(req.params.id);
+    if (!capsule) return res.status(404).json({ message: 'Capsule not found' });
+
+    // Only creator can trigger
+    if (capsule.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to trigger this capsule' });
+    }
+
+    // Must be an event-based capsule
+    if (!capsule.rules.eventName) {
+      return res.status(400).json({ message: 'This capsule is not event-based' });
+    }
+
+    // Must still be LOCKED
+    if (capsule.status !== 'LOCKED') {
+      return res.status(400).json({ message: `Capsule is already ${capsule.status.toLowerCase()}` });
+    }
+
+    capsule.status = 'UNLOCKED';
+    await capsule.save();
+
+    // Emit real-time notification
+    const io = getIo();
+    if (io) {
+      io.to(capsule.creator.toString()).emit('capsule_status_changed', {
+        capsuleId: capsule._id,
+        status: 'UNLOCKED',
+        event: capsule.rules.eventName,
+      });
+      if (capsule.recipient) {
+        io.to(capsule.recipient.toString()).emit('capsule_status_changed', {
+          capsuleId: capsule._id,
+          status: 'UNLOCKED',
+          event: capsule.rules.eventName,
+        });
+      }
+    }
+
+    res.status(200).json({ message: `Capsule unlocked! Event '${capsule.rules.eventName}' triggered.`, capsule });
+  } catch (err) {
+    console.error('[Capsule] Trigger error:', err.message);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { createCapsule, getVault, getSentCapsules, getReceivedCapsules, viewCapsule, deleteCapsule, triggerEventCapsule };

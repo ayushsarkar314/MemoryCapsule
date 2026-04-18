@@ -43,6 +43,25 @@ const unlockDueCapsules = async () => {
 };
 
 /**
+ * TASK 5: Unlock event-based capsules whose eventTriggerDate has passed
+ * (hybrid mode — auto-unlock if user didn't manually trigger before the date)
+ */
+const unlockEventCapsulesByDate = async () => {
+  const now = new Date();
+  const result = await Capsule.updateMany(
+    {
+      status: 'LOCKED',
+      'rules.eventName': { $ne: null },
+      'rules.eventTriggerDate': { $ne: null, $lte: now },
+    },
+    { $set: { status: 'UNLOCKED' } }
+  );
+  if (result.modifiedCount > 0) {
+    console.log(`[Lifecycle] Auto-unlocked ${result.modifiedCount} event capsule(s) by date`);
+  }
+};
+
+/**
  * TASK 2: Expire capsules whose expireAt date has passed
  */
 const expireDueCapsules = async () => {
@@ -126,6 +145,7 @@ const startLifecycleEngine = () => {
   cron.schedule('* * * * *', async () => {
     try {
       await unlockDueCapsules();
+      await unlockEventCapsulesByDate();
       await expireDueCapsules();
       await expireGhostWallPosts();
       await destroyDueCapsules();
@@ -135,4 +155,4 @@ const startLifecycleEngine = () => {
   });
 };
 
-module.exports = { startLifecycleEngine, deleteFromCloudinary, getResourceType, unlockDueCapsules, expireDueCapsules, expireGhostWallPosts, destroyDueCapsules };
+module.exports = { startLifecycleEngine, deleteFromCloudinary, getResourceType, unlockDueCapsules, unlockEventCapsulesByDate, expireDueCapsules, expireGhostWallPosts, destroyDueCapsules };

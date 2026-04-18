@@ -25,13 +25,14 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./src/config/db');
-const { startLifecycleEngine, unlockDueCapsules, expireDueCapsules, expireGhostWallPosts } = require('./src/utils/lifecycleEngine');
+const { startLifecycleEngine, unlockDueCapsules, unlockEventCapsulesByDate, expireDueCapsules, expireGhostWallPosts } = require('./src/utils/lifecycleEngine');
 
 // Routes
 const authRoutes = require('./src/routes/authRoutes');
 const capsuleRoutes = require('./src/routes/capsuleRoutes');
 const ghostWallRoutes = require('./src/routes/ghostWallRoutes');
 const friendRoutes = require('./src/routes/friendRoutes');
+const aiRoutes = require('./src/routes/aiRoutes');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/capsules', capsuleRoutes);
 app.use('/api/ghost', ghostWallRoutes);
 app.use('/api/friends', friendRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Memory Capsule API running' }));
@@ -69,6 +71,7 @@ app.post('/api/cron', async (req, res) => {
   }
   try {
     await unlockDueCapsules();
+    await unlockEventCapsulesByDate();
     await expireDueCapsules();
     await expireGhostWallPosts();
     res.status(200).json({ message: 'Lifecycle engine executed successfully' });
