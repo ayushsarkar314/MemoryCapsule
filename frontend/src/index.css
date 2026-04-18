@@ -1025,3 +1025,258 @@ a:hover { color: var(--color-amber-dark); }
   .navbar { padding: var(--space-3) var(--space-4); }
   .countdown-display { flex-wrap: wrap; gap: var(--space-3); }
 }
+
+/* ── VAULT.OS GLOBAL STYLES ─────────────────────────────── */
+
+:root {
+  --green:    #00ff9f;
+  --green-dim: #00ff9f66;
+  --green-faint: #00ff9f18;
+  --cyan:     #00ccff;
+  --cyan-dim: #00ccff44;
+  --pink:     #ff3c6e;
+  --pink-dim: #ff3c6e44;
+  --amber:    #ffb800;
+  --amber-dim:#ffb80044;
+  --purple:   #cc44ff;
+  --purple-dim:#cc44ff44;
+  --bg:       #000000;
+  --bg2:      #04080a;
+  --bg3:      #080e0c;
+  --border:   #00ff9f1a;
+  --border2:  #00ff9f33;
+  --text:     #e0e0e0;
+  --muted:    #ffffff44;
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --font-display: 'Orbitron', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--green);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCANLINES ─────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 159, 0.013) 2px,
+    rgba(0, 255, 159, 0.013) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanroll 8s linear infinite;
+}
+
+@keyframes scanroll {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ── CRT VIGNETTE ─────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--green-dim);
+  border-radius: 2px;
+}
+
+/* ── ANIMATIONS ────────────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92%       { opacity: 1; }
+  93%       { opacity: 0.85; }
+  94%       { opacity: 1; }
+  96%       { opacity: 0.9; }
+  97%       { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glitch {
+  0%   { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 0); }
+  20%  { clip-path: inset(92% 0 1%  0); transform: translate(1px, 0);  }
+  40%  { clip-path: inset(43% 0 1%  0); transform: translate(-1px, 0); }
+  60%  { clip-path: inset(25% 0 58% 0); transform: translate(2px, 0);  }
+  80%  { clip-path: inset(54% 0 7%  0); transform: translate(-2px, 0); }
+  100% { clip-path: inset(58% 0 43% 0); transform: translate(1px, 0);  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 4px var(--green-dim); }
+  50%       { box-shadow: 0 0 12px var(--green-dim), 0 0 24px #00ff9f11; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes progressBar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* ===================================================== */
+/*  LANDING PAGE                                         */
+/* ===================================================== */
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--gradient-hero);
+  text-align: center;
+}
+
+.landing-page::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212, 132, 90, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.landing-page::after {
+  content: '';
+  position: absolute;
+  bottom: -15%;
+  left: -8%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201, 120, 120, 0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.landing-hero {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8);
+  max-width: 800px;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.hero-subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.theme-toggle-btn {
+  position: absolute;
+  top: var(--space-6);
+  right: var(--space-6);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: var(--shadow-sm) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  padding: var(--space-2) var(--space-4) !important;
+}
+
+.theme-toggle-btn:hover {
+  background: #fff !important;
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+.terminal-theme-wrapper {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-theme-wrapper .theme-toggle-btn {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  z-index: 10000;
+  background: rgba(0, 255, 159, 0.1) !important;
+  border: 1px solid #00ff9f !important;
+  color: #00ff9f !important;
+}
+
+.terminal-theme-wrapper .theme-toggle-btn:hover {
+  background: rgba(0, 255, 159, 0.2) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 159, 0.3) !important;
+}
+
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.terminal-lines-area {
+  flex: 1;
+  overflow-y: auto;
+  background: #000;
+}
