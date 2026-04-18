@@ -546,11 +546,15 @@ const CreatePage = () => {
         />
       )}
 
-      {/* Success Animation Overlay (Postman Delivery) */}
+      {/* Success Animation Overlay (Refined Blue Postman Delivery) */}
       {showSuccess && (
         <div className="success-overlay">
-          <div className="vault-animation">🫙</div>
-          <div className="envelope-flying">💌</div>
+          <div className="postman-sequence">
+            <div className="vault-jar-back"></div>
+            <div className="envelope-flying">💌</div>
+            <div className="vault-jar-front"></div>
+            <div className="vault-jar-lid"></div>
+          </div>
         </div>
       )}
     </div>

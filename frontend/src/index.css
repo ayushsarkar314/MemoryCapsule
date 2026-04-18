@@ -21,6 +21,10 @@
   --color-rose-muted:  #E8C4C4;
   --color-blush:       #F2DDD8;
 
+  --color-maritime-blue: #1e3a8a;
+  --color-maritime-blue-light: rgba(30, 58, 138, 0.4);
+  --color-maritime-blue-deep: #172554;
+
   --color-sage:        #8FA88A;
   --color-sage-light:  #B5C9B1;
   --color-dusty-blue:  #8AA4B8;
@@ -1213,67 +1217,113 @@ a:hover { color: var(--color-amber-dark); }
 /*  SUCCESS ANIMATIONS                                   */
 /* ===================================================== */
 
-/* ===================================================== */
-/*  POSTMAN SUCCESS ANIMATIONS (REFINED SEQUENCE)        */
-/* ===================================================== */
-
-@keyframes envelope-pop-first {
-  0% { transform: translate(-50%, -120%) scale(0) rotate(-10deg); opacity: 0; }
-  50% { transform: translate(-50%, -130%) scale(1.2) rotate(10deg); opacity: 1; }
+@keyframes envelope-pop-refined {
+  0% { transform: translate(-50%, -120%) scale(0) rotate(-15deg); opacity: 0; }
+  50% { transform: translate(-50%, -130%) scale(1.1) rotate(10deg); opacity: 1; }
   100% { transform: translate(-50%, -120%) scale(1) rotate(0deg); opacity: 1; }
 }
 
-@keyframes vault-entrance-after {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+@keyframes envelope-descend {
+  0% { transform: translate(-50%, -120%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -40%) scale(0.6); opacity: 0.2; }
+}
+
+@keyframes jar-assemble {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-@keyframes envelope-tuck-inside {
-  0% { transform: translate(-50%, -120%) scale(1); opacity: 1; }
-  100% { transform: translate(-50%, -40%) scale(0); opacity: 0; }
+@keyframes lid-close {
+  0% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
 }
 
-@keyframes vault-seal-and-send-refined {
-  0%, 40% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); filter: brightness(1.5); }
-  60% { transform: translate(-50%, -50%) scale(1) rotate(-5deg); }
-  85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  100% { transform: translate(150vw, -150vh) scale(0.5) rotate(15deg); opacity: 0; }
+@keyframes jar-send-off {
+  0%, 70% { transform: translate(-50%, -50%) scale(1); }
+  75% { transform: translate(-50%, -50%) scale(1.05); filter: brightness(2); }
+  80% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(150vw, -150vh) scale(0.4) rotate(20deg); opacity: 0; }
 }
 
 .success-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(250, 246, 241, 0.4); 
+  background: rgba(15, 23, 42, 0.3); /* Slate dark tint */
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  backdrop-filter: blur(2px);
 }
 
-.vault-animation {
-  font-size: 8rem;
+.postman-sequence {
+  position: relative;
+  width: 200px;
+  height: 250px;
+  animation: jar-send-off 3.5s ease 0.5s forwards;
+}
+
+.vault-jar-back, .vault-jar-front {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* Delayed entry until envelope is ready */
-  animation: 
-    vault-entrance-after 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.7s both,
-    vault-seal-and-send-refined 3s ease 0.7s forwards;
-  filter: drop-shadow(0 20px 40px rgba(107, 79, 58, 0.4));
+  width: 120px;
+  height: 160px;
+  border-radius: 30px 30px 45% 45%;
+  animation: jar-assemble 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both;
+}
+
+.vault-jar-back {
+  background: var(--color-maritime-blue-deep);
+  border: 4px solid var(--color-maritime-blue);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+}
+
+.vault-jar-front {
+  background: var(--color-maritime-blue-light);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Jar Shine */
+.vault-jar-front::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 20%;
+  height: 50%;
+  background: linear-gradient(to right, rgba(255,255,255,0.3), transparent);
+  border-radius: 50%;
+}
+
+.vault-jar-lid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 30px;
+  background: var(--color-maritime-blue-deep);
+  border: 3px solid var(--color-maritime-blue);
+  border-radius: 8px 8px 15px 15px;
+  z-index: 15;
+  animation: lid-close 0.5s ease 2.2s both;
 }
 
 .envelope-flying {
-  font-size: 4rem;
+  font-size: 3.5rem;
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 5;
   transform: translate(-50%, -50%);
   animation: 
-    envelope-pop-first 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    envelope-tuck-inside 0.8s ease-in-out 1.5s forwards;
+    envelope-pop-refined 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    envelope-descend 1s ease-in-out 1.2s forwards;
 }
 
 .clickable-image {
