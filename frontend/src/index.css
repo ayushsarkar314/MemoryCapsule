@@ -891,14 +891,14 @@ a:hover {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(25px) saturate(100%);
-  -webkit-backdrop-filter: blur(25px) saturate(100%);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(25px) saturate(110%);
+  -webkit-backdrop-filter: blur(25px) saturate(110%);
   border-radius: var(--radius-2xl);
   padding: var(--space-10) var(--space-8);
   box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   z-index: 1;
