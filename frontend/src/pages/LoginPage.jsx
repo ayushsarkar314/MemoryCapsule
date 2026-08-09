@@ -2,21 +2,35 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import './LoginPage.css';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ identifier: '', password: '' });
+
+  const [form, setForm] = useState({
+    identifier: '',
+    password: '',
+  });
+
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!form.identifier || !form.password) {
       return toast.error('Please fill in all fields');
     }
+
     setLoading(true);
+
     try {
       await login(form.identifier, form.password);
       toast.success('Welcome back ✨');
@@ -29,22 +43,30 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        {/* Logo */}
-        <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Welcome back</h1>
-          <p className="text-muted text-sm">Your memories are waiting for you</p>
+    <div className="login-page">
+      <div className="login-card">
+
+        {/* Logo / Brand */}
+        <div className="login-header">
+          <div className="login-logo">✦</div>
+
+          <h1>Welcome back</h1>
+
+          <p>Your memories are waiting for you.</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="identifier">Email or Username</label>
+
+          {/* Email / Username */}
+          <div className="login-form-group">
+            <label htmlFor="identifier">
+              Email or Username
+            </label>
+
             <input
               id="identifier"
               name="identifier"
               type="text"
-              className="form-input"
               placeholder="you@example.com or @username"
               value={form.identifier}
               onChange={handleChange}
@@ -52,21 +74,22 @@ const LoginPage = () => {
             />
           </div>
 
-          <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <label className="form-label" htmlFor="password" style={{ margin: 0 }}>Password</label>
-              <Link
-                to="/forgot-password"
-                style={{ fontSize: '0.8rem', color: 'var(--color-amber)', fontWeight: 600, textDecoration: 'none' }}
-              >
+          {/* Password */}
+          <div className="login-form-group">
+            <div className="password-header">
+              <label htmlFor="password">
+                Password
+              </label>
+
+              <Link to="/forgot-password">
                 Forgot password?
               </Link>
             </div>
+
             <input
               id="password"
               name="password"
               type="password"
-              className="form-input"
               placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
@@ -74,23 +97,35 @@ const LoginPage = () => {
             />
           </div>
 
+          {/* Submit */}
           <button
             id="login-submit"
             type="submit"
-            className="btn btn-primary w-full"
-            style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)' }}
+            className="login-button"
             disabled={loading}
           >
-            {loading ? <><span className="spinner" />  Signing in…</> : 'Sign In'}
+            {loading ? (
+              <>
+                <span className="login-spinner" />
+                Signing in…
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
-        <div className="divider" />
+        <div className="login-divider">
+          <span>or</span>
+        </div>
 
-        <p className="text-center text-sm text-muted">
+        <p className="login-register">
           Don't have an account?{' '}
-          <Link to="/register" style={{ fontWeight: 600 }}>Create one</Link>
+          <Link to="/register">
+            Create one
+          </Link>
         </p>
+
       </div>
     </div>
   );
