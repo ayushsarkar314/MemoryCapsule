@@ -864,3 +864,423 @@
   border-color: rgba(160, 110, 180, 0.3) !important;
   color: #c9b8e0 !important;
 }
+
+/* =====================================================
+   INTERACTIVE STATE FIXES — create-shader-bg pages
+   Fixes ALL white backgrounds that appear on
+   click / hover / focus / active / selected.
+   Scoped entirely under .create-shader-bg.
+   ===================================================== */
+
+/* ── .btn-secondary & .btn-ghost: no white on hover ── */
+.create-shader-bg .btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(160, 110, 180, 0.3);
+  color: #d4aaee;
+}
+.create-shader-bg .btn-secondary:hover {
+  background: rgba(160, 110, 180, 0.2) !important;
+  border-color: rgba(160, 110, 180, 0.5) !important;
+  color: #f0e8ff !important;
+  box-shadow: 0 4px 16px rgba(120, 60, 160, 0.25);
+  transform: translateY(-1px);
+}
+
+.create-shader-bg .btn-ghost {
+  background: transparent;
+  border-color: rgba(160, 110, 180, 0.25);
+  color: #c9b8e0;
+}
+.create-shader-bg .btn-ghost:hover {
+  background: rgba(160, 110, 180, 0.18) !important;
+  color: #f0e8ff !important;
+}
+
+/* ── .btn-primary: keep solid purple, deepen on hover ── */
+.create-shader-bg .btn-primary {
+  background: linear-gradient(135deg, #7a545f 0%, #603d48 100%);
+  box-shadow: 0 4px 16px rgba(122, 84, 95, 0.35);
+  color: #fff;
+}
+.create-shader-bg .btn-primary:hover {
+  background: linear-gradient(135deg, #8a6070 0%, #703d50 100%);
+  box-shadow: 0 6px 24px rgba(122, 84, 95, 0.5);
+}
+.create-shader-bg .btn-primary:active {
+  background: linear-gradient(135deg, #603d48 0%, #4a2c38 100%);
+}
+
+/* ── .lp-btn-primary ── */
+.create-shader-bg .lp-btn-primary {
+  background: linear-gradient(135deg, #7a545f 0%, #603d48 100%);
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(122, 84, 95, 0.35);
+}
+.create-shader-bg .lp-btn-primary:hover {
+  background: linear-gradient(135deg, #8a6070 0%, #703d50 100%);
+  box-shadow: 0 6px 24px rgba(122, 84, 95, 0.5);
+}
+
+/* ── Status tab hover / active styles (match Ghost CTA) ── */
+.create-shader-bg .status-tab {
+  transition: all 0.25s;
+}
+.create-shader-bg .status-tab:hover {
+  background: linear-gradient(135deg, #ff7ab3 0%, #ff4a90 100%);
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(255,74,140,0.24);
+  transform: translateY(-2px);
+}
+.create-shader-bg .status-tab.active {
+  background: linear-gradient(135deg, #ff7ab3 0%, #ff4a90 100%);
+  color: #fff !important;
+  box-shadow: 0 6px 24px rgba(255,74,140,0.24);
+}
+.create-shader-bg .status-tab.active:hover {
+  box-shadow: 0 8px 32px rgba(255,74,140,0.28);
+}
+
+/* ── Status tabs: no white active state ── */
+.create-shader-bg .status-tabs {
+  background: rgba(20, 8, 35, 0.45) !important;
+  border-color: rgba(160, 110, 180, 0.2) !important;
+}
+.create-shader-bg .status-tab {
+  color: #c9b8e0;
+  background: transparent;
+}
+.create-shader-bg .status-tab:hover {
+  background: rgba(140, 80, 200, 0.2) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .status-tab.active {
+  background: rgba(160, 90, 220, 0.32) !important;
+  color: #f0e8ff !important;
+  box-shadow: 0 2px 12px rgba(120, 60, 180, 0.3);
+}
+
+/* ── Content type buttons (inline style overrides) ── */
+/* These use inline styles in JSX, so we override the
+   *base* classes they also carry to cancel white hover */
+.create-shader-bg .content-type-btn {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(160, 110, 180, 0.22) !important;
+  color: #c9b8e0 !important;
+}
+.create-shader-bg .content-type-btn:hover {
+  background: rgba(140, 80, 200, 0.2) !important;
+  border-color: rgba(160, 110, 180, 0.45) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .content-type-btn.selected {
+  background: rgba(160, 90, 220, 0.25) !important;
+  border-color: rgba(190, 130, 255, 0.55) !important;
+  color: #d4aaee !important;
+}
+
+/* ── Rule option buttons ── */
+.create-shader-bg .rule-option {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(160, 110, 180, 0.18) !important;
+  color: #c9b8e0 !important;
+}
+.create-shader-bg .rule-option:hover {
+  background: rgba(140, 80, 200, 0.18) !important;
+  border-color: rgba(160, 110, 180, 0.4) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .rule-option.selected {
+  background: rgba(160, 90, 220, 0.22) !important;
+  border-color: rgba(190, 130, 255, 0.5) !important;
+}
+.create-shader-bg .rule-option-title {
+  color: #f0e8ff !important;
+}
+.create-shader-bg .rule-option-desc {
+  color: #a890c8 !important;
+}
+
+/* ── .card and .card-glass: no white on hover ── */
+.create-shader-bg .card {
+  background: rgba(20, 8, 35, 0.35) !important;
+  border-color: rgba(160, 110, 180, 0.18) !important;
+  color: #f0e8ff;
+}
+.create-shader-bg .card:hover {
+  background: rgba(30, 10, 50, 0.45) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(160, 110, 180, 0.25) !important;
+}
+.create-shader-bg .card-glass {
+  background: rgba(20, 8, 35, 0.38) !important;
+  border: 1px solid rgba(160, 110, 180, 0.22) !important;
+  color: #f0e8ff;
+}
+.create-shader-bg .card-frosted {
+  background: rgba(20, 8, 35, 0.38) !important;
+  border-color: rgba(160, 110, 180, 0.2) !important;
+}
+.create-shader-bg .card-frosted:hover {
+  background: rgba(30, 10, 50, 0.48) !important;
+}
+
+/* ── Capsule cards (on Shared page) ── */
+.create-shader-bg .capsule-card {
+  background: rgba(20, 8, 35, 0.42) !important;
+  border-color: rgba(160, 110, 180, 0.25) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .capsule-card:hover {
+  background: rgba(30, 10, 50, 0.52) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+}
+.create-shader-bg .capsule-card .text-muted {
+  color: #c9b8e0 !important;
+}
+.create-shader-bg .capsule-card h3,
+.create-shader-bg .capsule-card h4,
+.create-shader-bg .capsule-card p {
+  color: #f0e8ff !important;
+}
+
+/* ── Modal: dark purple glass, NOT warm white ── */
+.create-shader-bg .modal-overlay {
+  background: rgba(4, 0, 14, 0.72) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.create-shader-bg .modal {
+  background: rgba(18, 6, 32, 0.92) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(160, 110, 180, 0.3) !important;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .modal h3,
+.create-shader-bg .modal h4,
+.create-shader-bg .modal p,
+.create-shader-bg .modal label,
+.create-shader-bg .modal span {
+  color: #f0e8ff !important;
+}
+
+/* ── Dropzone hover: purple glow, not pink ── */
+.create-shader-bg .dropzone:hover,
+.create-shader-bg .dropzone.active {
+  background: rgba(140, 80, 200, 0.12) !important;
+  border-color: rgba(180, 120, 255, 0.55) !important;
+  color: #d4aaee !important;
+}
+
+/* ── AI Suggest toggle button ── */
+.create-shader-bg .ai-suggest-toggle {
+  background: rgba(30, 12, 50, 0.65) !important;
+  border-color: rgba(160, 110, 180, 0.35) !important;
+  color: #d4aaee !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.create-shader-bg .ai-suggest-toggle:hover {
+  background: rgba(90, 50, 130, 0.55) !important;
+  border-color: rgba(190, 130, 255, 0.5) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .ai-sparkle {
+  color: #d4aaee !important;
+}
+.create-shader-bg .ai-suggest-toggle:hover .ai-sparkle {
+  color: #f0e8ff !important;
+}
+
+/* ── AI Panel (full panel) ── */
+.create-shader-bg .ai-suggest-panel {
+  background: rgba(18, 6, 32, 0.82) !important;
+  border-color: rgba(160, 110, 180, 0.25) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 16px 40px rgba(0, 0, 0, 0.4) !important;
+}
+.create-shader-bg .ai-panel-title {
+  color: #f0e8ff !important;
+}
+.create-shader-bg .ai-panel-sub {
+  color: #c9b8e0 !important;
+}
+
+/* ── AI refresh button ── */
+.create-shader-bg .ai-refresh-btn {
+  background: rgba(160, 110, 180, 0.12) !important;
+  border-color: rgba(160, 110, 180, 0.25) !important;
+  color: #d4aaee !important;
+}
+.create-shader-bg .ai-refresh-btn:hover:not(:disabled) {
+  background: rgba(90, 50, 130, 0.5) !important;
+  color: #f0e8ff !important;
+}
+
+/* ── AI hint input ── */
+.create-shader-bg .ai-hint-input {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(160, 110, 180, 0.28) !important;
+  color: #f0e8ff !important;
+}
+.create-shader-bg .ai-hint-input::placeholder {
+  color: rgba(200, 180, 225, 0.5) !important;
+}
+.create-shader-bg .ai-hint-input:focus {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(190, 130, 255, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(140, 80, 200, 0.2) !important;
+}
+
+/* ── AI cards ── */
+.create-shader-bg .ai-card {
+  background: rgba(30, 12, 50, 0.6) !important;
+  border-color: rgba(160, 110, 180, 0.2) !important;
+}
+.create-shader-bg .ai-card:hover {
+  background: rgba(45, 18, 72, 0.72) !important;
+  border-color: rgba(190, 130, 255, 0.38) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+.create-shader-bg .ai-card-title {
+  color: #f0e8ff !important;
+}
+.create-shader-bg .ai-card-idea {
+  color: #c9b8e0 !important;
+}
+.create-shader-bg .ai-card-meta {
+  color: #a890c8 !important;
+}
+.create-shader-bg .ai-card-footer {
+  border-top-color: rgba(160, 110, 180, 0.15) !important;
+}
+
+/* ── AI "Use this" button ── */
+.create-shader-bg .ai-use-btn {
+  background: rgba(122, 84, 95, 0.85) !important;
+}
+.create-shader-bg .ai-use-btn:hover {
+  background: #7a545f !important;
+  box-shadow: 0 6px 16px rgba(122, 84, 95, 0.4) !important;
+}
+
+/* ── Ghost Wall post cards ── */
+.create-shader-bg .ghost-post-card {
+  background: rgba(20, 8, 35, 0.5) !important;
+  border-color: rgba(160, 110, 180, 0.18) !important;
+}
+.create-shader-bg .ghost-post-card:hover {
+  background: rgba(35, 14, 60, 0.62) !important;
+  border-color: rgba(160, 110, 180, 0.35) !important;
+}
+.create-shader-bg .ghost-reaction-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(160, 110, 180, 0.18) !important;
+  color: #c9b8e0 !important;
+}
+.create-shader-bg .ghost-reaction-btn:hover {
+  background: rgba(140, 80, 200, 0.2) !important;
+  color: #f0e8ff !important;
+}
+
+/* ── .text-muted on dark shader bg ── */
+.create-shader-bg .text-muted {
+  color: #a890c8 !important;
+}
+
+/* ── Links ── */
+.create-shader-bg a {
+  color: #c9a8f0;
+}
+.create-shader-bg a:hover {
+  color: #e0d0ff;
+}
+
+/* ── Dividers ── */
+.create-shader-bg .divider {
+  background: rgba(160, 110, 180, 0.2);
+}
+
+/* ── Chrome autofill kill: override yellow/white autofill bg ── */
+.create-shader-bg input:-webkit-autofill,
+.create-shader-bg input:-webkit-autofill:hover,
+.create-shader-bg input:-webkit-autofill:focus,
+.create-shader-bg input:-webkit-autofill:active,
+.create-shader-bg textarea:-webkit-autofill,
+.create-shader-bg select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px rgba(25, 10, 45, 0.95) inset !important;
+  -webkit-text-fill-color: #f0e8ff !important;
+  caret-color: #f0e8ff !important;
+  border-color: rgba(160, 110, 180, 0.4) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── Select dropdown option (native) ── */
+.create-shader-bg select option {
+  background: #1a0632;
+  color: #f0e8ff;
+}
+
+/* ── Friends page: search input container, friend cards ── */
+.create-shader-bg .lp-glass-card,
+.create-shader-bg [class*="glass"] {
+  background: rgba(20, 8, 35, 0.38);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(160, 110, 180, 0.22);
+}
+
+/* ── Scrollbar on shader pages ── */
+.create-shader-bg ::-webkit-scrollbar-thumb {
+  background: rgba(160, 110, 180, 0.4);
+}
+.create-shader-bg ::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 110, 180, 0.65);
+}
+
+/* ── Focus-visible ring: always purple, never blue ── */
+.create-shader-bg *:focus-visible {
+  outline: 2px solid rgba(190, 130, 255, 0.7) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── Badge colors on dark bg ── */
+.create-shader-bg .badge-locked {
+  background: rgba(138, 164, 184, 0.15);
+  color: #9bbfd8;
+}
+.create-shader-bg .badge-unlocked {
+  background: rgba(143, 168, 138, 0.15);
+  color: #a0c8a0;
+}
+.create-shader-bg .badge-expired {
+  background: rgba(196, 170, 150, 0.15);
+  color: #c8b090;
+}
+.create-shader-bg .badge-destroyed {
+  background: rgba(201, 120, 120, 0.15);
+  color: #d88888;
+}
+
+/* ── Countdown display on dark bg ── */
+.create-shader-bg .countdown-display {
+  background: rgba(30, 12, 50, 0.5);
+  border-color: rgba(160, 110, 180, 0.2);
+}
+.create-shader-bg .countdown-number {
+  color: #d4aaee;
+}
+.create-shader-bg .countdown-label,
+.create-shader-bg .countdown-sep {
+  color: #a890c8;
+}
+
+/* ── lp-eyebrow ── */
+.create-shader-bg .lp-eyebrow {
+  background: rgba(160, 110, 180, 0.18);
+  color: #d4aaee;
+  border-color: rgba(160, 110, 180, 0.3);
+}
+
+

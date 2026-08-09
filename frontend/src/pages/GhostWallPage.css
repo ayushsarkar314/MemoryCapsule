@@ -1,0 +1,902 @@
+/* ============================================================
+   GHOST WALL UI ONLY
+   ============================================================ */
+
+/*
+  IMPORTANT:
+
+  Do NOT add a background to .gw-page.
+
+  Your existing:
+      .create-shader-bg
+      <ShaderBackground />
+
+  remains responsible for the live background.
+*/
+
+.gw-page {
+  position: relative;
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   UI LAYER
+   ============================================================ */
+
+.gw-content {
+  position: relative;
+  z-index: 10;
+
+  width: 100%;
+}
+
+.gw-container {
+  width: min(680px, calc(100% - 32px));
+
+  margin: 0 auto;
+
+  padding-top: 80px;
+  padding-bottom: 80px;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.gw-header {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.gw-eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: 14px;
+  padding: 6px 12px;
+
+  border: 1px solid rgba(218, 162, 255, 0.25);
+  border-radius: 999px;
+
+  background: rgba(145, 63, 193, 0.16);
+
+  color: #d4a9eb;
+
+  font-family: Manrope, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.gw-title {
+  margin: 0;
+
+  color: #fff8ff;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(42px, 7vw, 62px);
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: -0.035em;
+
+  text-shadow:
+    0 3px 25px rgba(190, 90, 255, 0.18);
+}
+
+.gw-subtitle {
+  margin: 14px 0 22px;
+
+  color: rgba(244, 228, 249, 0.72);
+
+  font-family: Manrope, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   TOP BUTTON
+   ============================================================ */
+
+.gw-top-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 0 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+
+  background: rgba(24, 10, 32, 0.48);
+
+  color: #f5eaf7;
+
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.gw-top-button:hover {
+  background: rgba(88, 38, 111, 0.5);
+
+  border-color: rgba(215, 148, 255, 0.4);
+
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   CARD
+   ============================================================ */
+
+.gw-card {
+  box-sizing: border-box;
+
+  border: 1px solid rgba(224, 183, 255, 0.15);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(40, 15, 55, 0.84),
+      rgba(17, 7, 25, 0.84)
+    );
+
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* ============================================================
+   COMPOSER
+   ============================================================ */
+
+.gw-composer {
+  padding: 28px;
+
+  margin-bottom: 28px;
+
+  animation: gw-slide-down 220ms ease;
+}
+
+@keyframes gw-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gw-card-header {
+  margin-bottom: 24px;
+}
+
+.gw-card-header h2 {
+  margin: 0;
+
+  color: #fff5ff;
+
+  font-family: "Playfair Display", serif;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.gw-card-header p {
+  margin: 5px 0 0;
+
+  color: #a893ad;
+
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   FIELD
+   ============================================================ */
+
+.gw-field {
+  margin-bottom: 20px;
+}
+
+.gw-label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #d2c0d7;
+
+  font-family: Manrope, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   TEXT / IMAGE SWITCH
+   ============================================================ */
+
+.gw-segmented {
+  display: inline-flex;
+
+  padding: 4px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 13px;
+
+  background: rgba(5, 2, 9, 0.28);
+}
+
+.gw-segment {
+  min-width: 92px;
+
+  padding: 9px 15px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #9c89a3;
+
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.gw-segment:hover {
+  color: #eadff0;
+}
+
+.gw-segment.active {
+  background:
+    linear-gradient(
+      135deg,
+      #a65be6,
+      #c66bd8
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(174, 81, 229, 0.24);
+}
+
+
+/* ============================================================
+   TEXTAREA
+   ============================================================ */
+
+.gw-text-field {
+  position: relative;
+}
+
+.gw-textarea {
+  display: block;
+
+  width: 100%;
+  min-height: 132px;
+
+  box-sizing: border-box;
+
+  padding: 15px 16px 30px;
+
+  border: 1px solid rgba(224, 183, 255, 0.15);
+  border-radius: 14px;
+
+  outline: none;
+
+  background: rgba(5, 2, 9, 0.35);
+
+  color: #fff8ff;
+
+  font-family: Manrope, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+
+  resize: vertical;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.gw-textarea::placeholder {
+  color: #806b87;
+}
+
+.gw-textarea:hover {
+  border-color: rgba(214, 145, 255, 0.28);
+}
+
+.gw-textarea:focus {
+  border-color: rgba(199, 111, 255, 0.65);
+
+  background: rgba(5, 2, 9, 0.5);
+
+  box-shadow:
+    0 0 0 3px rgba(184, 92, 255, 0.09);
+}
+
+.gw-character-count {
+  position: absolute;
+
+  right: 12px;
+  bottom: 9px;
+
+  color: #6e5a75;
+
+  font-family: Manrope, sans-serif;
+  font-size: 10px;
+}
+
+
+/* ============================================================
+   IMAGE UPLOAD
+   ============================================================ */
+
+.gw-upload {
+  min-height: 155px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  border: 1.5px dashed rgba(194, 112, 255, 0.4);
+  border-radius: 15px;
+
+  background: rgba(5, 2, 9, 0.25);
+
+  color: #d8c7de;
+
+  font-family: Manrope, sans-serif;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.gw-upload:hover,
+.gw-upload-active {
+  border-color: rgba(205, 125, 255, 0.85);
+
+  background: rgba(174, 86, 236, 0.1);
+
+  transform: translateY(-1px);
+}
+
+.gw-upload-icon {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  margin-bottom: 10px;
+
+  border-radius: 12px;
+
+  background: rgba(188, 99, 255, 0.13);
+
+  color: #d194ff;
+
+  font-size: 20px;
+}
+
+.gw-upload-icon.success {
+  background: rgba(78, 205, 140, 0.12);
+
+  color: #76e3a8;
+}
+
+.gw-upload strong {
+  max-width: 90%;
+
+  overflow: hidden;
+
+  color: #f4e9f6;
+
+  font-size: 14px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gw-upload span {
+  margin-top: 4px;
+
+  color: #97829f;
+
+  font-size: 12px;
+}
+
+.gw-upload small {
+  margin-top: 11px;
+
+  color: #6d5974;
+
+  font-size: 10px;
+}
+
+
+/* ============================================================
+   EXPIRY
+   ============================================================ */
+
+.gw-expiry-field {
+  margin-top: 22px;
+}
+
+.gw-expiry-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+.gw-expiry {
+  min-height: 38px;
+
+  padding: 6px 5px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #9d899f;
+
+  font-family: Manrope, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.gw-expiry:hover {
+  border-color: rgba(194, 110, 255, 0.42);
+
+  color: #e7d9eb;
+
+  background: rgba(187, 100, 255, 0.07);
+}
+
+.gw-expiry.active {
+  border-color: rgba(204, 122, 255, 0.7);
+
+  background: rgba(188, 99, 255, 0.15);
+
+  color: #dfadff;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(188, 99, 255, 0.08);
+}
+
+
+/* ============================================================
+   RELEASE BUTTON
+   ============================================================ */
+
+.gw-release {
+  width: 100%;
+  min-height: 50px;
+
+  margin-top: 4px;
+
+  border: none;
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #a752e4,
+      #cf6bc9
+    );
+
+  color: #ffffff;
+
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 9px 26px rgba(171, 76, 224, 0.22);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.gw-release:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 13px 32px rgba(171, 76, 224, 0.34);
+}
+
+.gw-release:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.gw-release:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   POSTS
+   ============================================================ */
+
+.gw-post-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.gw-post {
+  padding: 22px;
+}
+
+.gw-post-text {
+  margin: 0 0 18px;
+
+  color: #f2e8f4;
+
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.gw-post-image {
+  display: block;
+
+  width: 100%;
+  max-height: 380px;
+
+  margin-bottom: 18px;
+
+  border-radius: 14px;
+
+  object-fit: cover;
+}
+
+
+/* ============================================================
+   POST FOOTER
+   ============================================================ */
+
+.gw-post-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.gw-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  min-height: 28px;
+
+  box-sizing: border-box;
+
+  padding: 0 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+
+  background: rgba(4, 2, 7, 0.25);
+
+  color: #a795ab;
+
+  font-family: Manrope, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gw-timer-icon {
+  font-size: 11px;
+}
+
+.gw-reactions {
+  display: flex;
+  gap: 6px;
+}
+
+.gw-reaction {
+  min-width: 42px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  padding: 0 9px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  color: #c3b1c7;
+
+  font-family: Manrope, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.gw-reaction:hover {
+  border-color: rgba(196, 111, 255, 0.35);
+
+  background: rgba(185, 93, 255, 0.12);
+
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.gw-empty {
+  padding: 55px 25px;
+
+  text-align: center;
+}
+
+.gw-empty-icon {
+  margin-bottom: 12px;
+
+  font-size: 42px;
+
+  opacity: 0.8;
+}
+
+.gw-empty h2 {
+  margin: 0 0 7px;
+
+  color: #f5ebf6;
+
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+}
+
+.gw-empty p {
+  margin: 0;
+
+  color: #8d798f;
+
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+}
+
+.gw-empty-button {
+  margin-top: 20px;
+
+  padding: 10px 16px;
+
+  border: 1px solid rgba(195, 109, 255, 0.28);
+  border-radius: 10px;
+
+  background: rgba(184, 97, 255, 0.09);
+
+  color: #d5a6ed;
+
+  font-family: Manrope, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.gw-empty-button:hover {
+  background: rgba(184, 97, 255, 0.16);
+
+  border-color: rgba(195, 109, 255, 0.45);
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.gw-skeleton-card {
+  min-height: 120px;
+
+  padding: 22px;
+}
+
+.gw-skeleton {
+  width: 65%;
+  height: 9px;
+
+  margin-bottom: 11px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.035)
+    );
+
+  background-size: 200% 100%;
+
+  animation: gw-skeleton-animation 1.5s ease infinite;
+}
+
+.gw-skeleton-lg {
+  width: 82%;
+}
+
+.gw-skeleton-sm {
+  width: 35%;
+}
+
+@keyframes gw-skeleton-animation {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .gw-container {
+    width: calc(100% - 24px);
+
+    padding-top: 48px;
+    padding-bottom: 55px;
+  }
+
+  .gw-title {
+    font-size: 43px;
+  }
+
+  .gw-subtitle {
+    font-size: 14px;
+  }
+
+  .gw-composer {
+    padding: 20px;
+
+    border-radius: 18px;
+  }
+
+  .gw-expiry-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gw-post {
+    padding: 18px;
+  }
+
+  .gw-post-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .gw-reactions {
+    width: 100%;
+  }
+
+  .gw-reaction {
+    flex: 1;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL SCREENS
+   ============================================================ */
+
+@media (max-width: 380px) {
+
+  .gw-container {
+    width: calc(100% - 18px);
+  }
+
+  .gw-composer {
+    padding: 16px;
+  }
+
+  .gw-title {
+    font-size: 38px;
+  }
+
+  .gw-segment {
+    min-width: 82px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .gw-expiry {
+    font-size: 10px;
+  }
+}
