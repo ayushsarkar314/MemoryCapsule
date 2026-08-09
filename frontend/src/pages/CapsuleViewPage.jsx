@@ -5,6 +5,8 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import Countdown from '../components/Countdown';
+import ShaderBackground from '../components/ShaderBackground';
+import './LandingPage.css';
 
 const CapsuleViewPage = () => {
   const { id } = useParams();
@@ -36,7 +38,7 @@ const CapsuleViewPage = () => {
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#D4845A', '#C97878', '#F2DDD8', '#8FA88A']
+            colors: ['#7a545f', '#603d48', '#f2ddd8', '#8fa88a']
           });
         }
       } catch (err) {
@@ -52,34 +54,44 @@ const CapsuleViewPage = () => {
   }, [id]);
 
   if (loading) return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="spinner spinner-amber" style={{ width: 40, height: 40 }} />
+    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+      <div className="ai-loading-orb" style={{ zIndex: 2 }} />
     </div>
   );
 
   if (error) return (
-    <div className="container page-content">
-      <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center', paddingTop: 'var(--space-12)' }}>
-        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>
-          {error.isDestroyed ? '💨' : '🔒'}
-        </div>
-        <h2 style={{ marginBottom: 'var(--space-4)' }}>{error.msg}</h2>
-        {error.unlocksAt && (
-          <>
-            <p className="text-muted" style={{ marginBottom: 'var(--space-6)' }}>
-              This capsule unlocks {formatDistanceToNow(new Date(error.unlocksAt), { addSuffix: true })}
+    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+      <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '120px', paddingBottom: '64px', maxWidth: '520px', margin: '0 auto', textAlign: 'center' }}>
+        <div className="lp-glass-card" style={{ padding: '40px', borderRadius: '32px' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '16px' }}>
+            {error.isDestroyed ? '💨' : '🔒'}
+          </div>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', color: '#1d1b19', marginBottom: '16px', fontSize: '24px' }}>{error.msg}</h2>
+          {error.unlocksAt && (
+            <>
+              <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '15px', marginBottom: '24px' }}>
+                This capsule unlocks {formatDistanceToNow(new Date(error.unlocksAt), { addSuffix: true })}
+              </p>
+              <Countdown targetDate={new Date(error.unlocksAt)} />
+            </>
+          )}
+          {error.isDestroyed && (
+            <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '15px', marginBottom: '24px' }}>
+              This capsule was destroyed after being viewed and cannot be accessed again.
             </p>
-            <Countdown targetDate={new Date(error.unlocksAt)} />
-          </>
-        )}
-        {error.isDestroyed && (
-          <p className="text-muted" style={{ marginBottom: 'var(--space-6)' }}>
-            This capsule was destroyed after being viewed and cannot be accessed again.
-          </p>
-        )}
-        <button className="btn btn-secondary" style={{ marginTop: 'var(--space-8)' }} onClick={() => navigate(-1)}>
-          ← Go Back
-        </button>
+          )}
+          <button className="lp-btn-outline" style={{ marginTop: '24px', cursor: 'pointer' }} onClick={() => navigate(-1)}>
+            ← Go Back
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -89,33 +101,40 @@ const CapsuleViewPage = () => {
   const { title, contentType, textContent, mediaUrl, status, rules, creator, recipient, createdAt } = capsule;
 
   return (
-    <div className="container page-content">
-      <div style={{ maxWidth: 680, margin: '0 auto' }}>
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ marginBottom: 'var(--space-6)' }}>
+    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* ── Live Shader Background + Readability Overlay ── */}
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+
+      <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '720px', margin: '0 auto' }}>
+        <button className="lp-btn-outline" onClick={() => navigate(-1)} style={{ marginBottom: '24px', padding: '8px 20px', fontSize: '13px' }}>
           ← Back
         </button>
 
-        <div className="card-glass" style={{ padding: 'var(--space-10)' }}>
+        <div className="lp-glass-card" style={{ padding: '40px', borderRadius: '32px' }}>
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <h2 className="font-serif" style={{ marginBottom: 'var(--space-2)' }}>{title}</h2>
-            <p className="text-xs text-muted">
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <span className="lp-eyebrow" style={{ marginBottom: '12px' }}>Unsealed Memory</span>
+            <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 36px)', fontWeight: 700, color: '#1d1b19', marginBottom: '8px' }}>{title}</h2>
+            <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '14px' }}>
               Created {format(new Date(createdAt), 'MMMM d, yyyy')}
               {creator && ` · by ${creator.displayName || creator.username}`}
             </p>
 
             {status === 'DESTROYED' && (
-              <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'var(--color-blush)', borderRadius: 'var(--radius-md)' }}>
-                <p style={{ color: 'var(--color-rose)', fontWeight: 600 }}>💨 This capsule has been destroyed after being viewed.</p>
+              <div style={{ marginTop: '20px', padding: '16px', background: 'rgba(201, 120, 120, 0.15)', borderRadius: '16px', border: '1px solid rgba(201, 120, 120, 0.3)' }}>
+                <p style={{ color: '#c97878', fontWeight: 600, fontFamily: 'Manrope, sans-serif' }}>💨 This capsule has been destroyed after being viewed.</p>
               </div>
             )}
 
             {destroyCountdown && status !== 'DESTROYED' && (
-              <div style={{ marginTop: 'var(--space-5)', padding: 'var(--space-4)', background: 'rgba(255, 193, 7, 0.1)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 193, 7, 0.3)' }}>
-                <p style={{ color: '#856404', fontWeight: 600, textAlign: 'center' }}>
+              <div style={{ marginTop: '20px', padding: '16px', background: 'rgba(212, 132, 90, 0.12)', borderRadius: '16px', border: '1px solid rgba(212, 132, 90, 0.3)' }}>
+                <p style={{ color: '#b8643a', fontWeight: 600, textAlign: 'center', fontFamily: 'Manrope, sans-serif' }}>
                   ⏰ This capsule will be destroyed in:
                 </p>
-                <div style={{ textAlign: 'center', marginTop: 'var(--space-2)' }}>
+                <div style={{ textAlign: 'center', marginTop: '8px' }}>
                   <Countdown targetDate={destroyCountdown} onComplete={() => {
                     toast.error('This capsule has been destroyed!');
                     setCapsule(prev => prev ? { ...prev, status: 'DESTROYED' } : null);
@@ -127,18 +146,19 @@ const CapsuleViewPage = () => {
 
           {/* Content */}
           {status !== 'DESTROYED' && (
-            <div style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: '32px' }}>
               {contentType === 'text' && (
                 <div style={{
-                  background: 'var(--gradient-capsule)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-8)',
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: '1.1rem',
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  borderRadius: '24px',
+                  padding: '32px',
+                  fontFamily: 'Playfair Display, serif',
+                  fontSize: '1.15rem',
                   lineHeight: 1.85,
-                  color: 'var(--color-text-primary)',
-                  border: 'var(--border-light)',
+                  color: '#1d1b19',
+                  border: '1px solid rgba(122, 84, 95, 0.15)',
                   whiteSpace: 'pre-wrap',
+                  boxShadow: '0 4px 20px rgba(74, 43, 77, 0.05)',
                 }}>
                   {textContent}
                 </div>
@@ -151,28 +171,40 @@ const CapsuleViewPage = () => {
                   className="image-content-wrapper clickable-image"
                 >
                   <img src={mediaUrl} alt={title}
-                    style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }} />
+                    style={{ width: '100%', borderRadius: '24px', boxShadow: '0 8px 32px rgba(74, 43, 77, 0.12)' }} />
                 </div>
               )}
 
               {contentType === 'voice' && mediaUrl && (
-                <div style={{ padding: 'var(--space-6)', background: 'rgba(223, 160, 160, 0.15)', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid rgba(223, 160, 160, 0.2)' }}>
-                  <p style={{ fontSize: '2rem', marginBottom: 'var(--space-4)' }}>🎙️</p>
+                <div style={{ padding: '28px', background: 'rgba(122, 84, 95, 0.1)', borderRadius: '24px', textAlign: 'center', border: '1px solid rgba(122, 84, 95, 0.2)' }}>
+                  <p style={{ fontSize: '2rem', marginBottom: '16px' }}>🎙️</p>
                   <audio controls src={mediaUrl} style={{ width: '100%' }} />
                 </div>
               )}
 
               {contentType === 'video' && mediaUrl && (
-                <video controls src={mediaUrl} style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }} />
+                <video controls src={mediaUrl} style={{ width: '100%', borderRadius: '24px', boxShadow: '0 8px 32px rgba(74, 43, 77, 0.12)' }} />
               )}
             </div>
           )}
 
           {/* Metadata */}
-          <div style={{ paddingTop: 'var(--space-6)', borderTop: 'var(--border-light)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
-            {rules?.destroyAfterView && <span className="capsule-status-badge badge-destroyed">💣 Destroyed after view</span>}
-            {rules?.unlockAt && <span className="capsule-status-badge badge-locked">⏰ Unlocked {formatDistanceToNow(new Date(rules.unlockAt), { addSuffix: true })}</span>}
-            {rules?.expireAt && <span className="capsule-status-badge badge-expired">⌛ Expired {formatDistanceToNow(new Date(rules.expireAt), { addSuffix: true })}</span>}
+          <div style={{ paddingTop: '20px', borderTop: '1px solid rgba(122, 84, 95, 0.15)', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+            {rules?.destroyAfterView && (
+              <span style={{ background: 'rgba(201, 120, 120, 0.15)', color: '#c97878', padding: '6px 14px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'Manrope, sans-serif' }}>
+                💣 Destroyed after view
+              </span>
+            )}
+            {rules?.unlockAt && (
+              <span style={{ background: 'rgba(122, 84, 95, 0.12)', color: '#7a545f', padding: '6px 14px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'Manrope, sans-serif' }}>
+                ⏰ Unlocked {formatDistanceToNow(new Date(rules.unlockAt), { addSuffix: true })}
+              </span>
+            )}
+            {rules?.expireAt && (
+              <span style={{ background: 'rgba(184, 100, 58, 0.12)', color: '#b8643a', padding: '6px 14px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'Manrope, sans-serif' }}>
+                ⌛ Expired {formatDistanceToNow(new Date(rules.expireAt), { addSuffix: true })}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -200,7 +232,7 @@ const CapsuleViewPage = () => {
               maxWidth: '95vw', 
               maxHeight: '95vh', 
               objectFit: 'contain',
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: '16px',
               boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
             }} 
           />

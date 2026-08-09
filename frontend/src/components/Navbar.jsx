@@ -47,18 +47,18 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-actions" style={{ gap: 'var(--space-2)' }}>
-        <NavLink to="/profile" className="nav-link" style={{ padding: 'var(--space-1) var(--space-2)', gap: 'var(--space-2)' }}>
+        <NavLink to="/profile" className="nav-link" style={{ padding: '4px 10px', gap: '8px' }}>
           {user?.avatar ? (
             <img src={user.avatar} alt={user.username} className="avatar avatar-sm" />
           ) : (
             <div className="avatar avatar-sm avatar-placeholder"
-              style={{ background: 'var(--gradient-amber)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, borderRadius: '50%', flexShrink: 0 }}>
+              style={{ background: 'linear-gradient(135deg, #7a545f 0%, #603d48 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, borderRadius: '50%', flexShrink: 0, width: 32, height: 32 }}>
               {initials}
             </div>
           )}
           <span className="hide-on-mobile" style={{ whiteSpace: 'nowrap' }}>{user?.username}</span>
         </NavLink>
-        <button className="btn btn-ghost btn-sm" onClick={handleLogout} title="Logout" style={{ padding: 'var(--space-2) var(--space-3)', flexShrink: 0 }}>
+        <button className="btn btn-ghost btn-sm" onClick={handleLogout} title="Logout" style={{ padding: '6px 14px', borderRadius: '9999px', flexShrink: 0, color: '#4f4447', fontWeight: 600, fontFamily: 'Manrope, sans-serif' }}>
           <span className="hide-on-mobile">Logout</span>
           <span className="show-on-mobile" style={{ fontSize: '1.1rem', lineHeight: 1 }}><i className="fa-solid fa-right-from-bracket"></i></span>
         </button>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import ShaderBackground from '../components/ShaderBackground';
+import './LoginPage.css';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail]       = useState('');
@@ -24,42 +26,48 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        {/* Logo */}
-        <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Forgot Password</h1>
-          <p className="text-muted text-sm">Enter your email and we'll send you a reset link</p>
+    <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+
+      <div className="login-card lp-glass-card">
+        {/* Header */}
+        <div className="login-header">
+          <div className="login-logo">✦</div>
+          <h1>Forgot Password</h1>
+          <p>Enter your email and we'll send you a reset link</p>
         </div>
 
         {submitted ? (
           /* Success state */
           <div style={{
             textAlign: 'center',
-            padding: 'var(--space-8)',
-            background: 'var(--color-parchment)',
-            borderRadius: 'var(--radius-lg)',
+            padding: '32px 20px',
+            background: 'rgba(255, 255, 255, 0.65)',
+            borderRadius: '20px',
+            border: '1px solid rgba(122, 84, 95, 0.15)',
           }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-4)' }}>📬</div>
-            <h3 style={{ marginBottom: 'var(--space-3)', fontSize: '1.1rem' }}>Check your inbox!</h3>
-            <p className="text-muted text-sm" style={{ lineHeight: 1.7 }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>📬</div>
+            <h3 style={{ fontFamily: 'Playfair Display, serif', marginBottom: '12px', fontSize: '1.2rem', color: '#1d1b19' }}>Check your inbox!</h3>
+            <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '0.9rem', lineHeight: 1.7 }}>
               If <strong>{email}</strong> is registered, a password reset link has been sent.
               It expires in <strong>10 minutes</strong>.
             </p>
-            <p className="text-muted text-xs" style={{ marginTop: 'var(--space-4)' }}>
+            <p style={{ fontFamily: 'Manrope, sans-serif', color: '#7a545f', fontSize: '0.8rem', marginTop: '16px' }}>
               Didn't receive it? Check your spam folder.
             </p>
           </div>
         ) : (
           /* Form state */
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="forgot-email">Email Address</label>
+            <div className="login-form-group">
+              <label htmlFor="forgot-email">Email Address</label>
               <input
                 id="forgot-email"
                 name="email"
                 type="email"
-                className="form-input"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -71,19 +79,18 @@ const ForgotPasswordPage = () => {
             <button
               id="forgot-submit"
               type="submit"
-              className="btn btn-primary w-full"
-              style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)' }}
+              className="login-button"
               disabled={loading}
             >
-              {loading ? <><span className="spinner" />  Sending…</> : 'Send Reset Link'}
+              {loading ? <><span className="login-spinner" />  Sending…</> : 'Send Reset Link'}
             </button>
           </form>
         )}
 
-        <div className="divider" />
+        <div className="login-divider" />
 
-        <p className="text-center text-sm text-muted">
-          <Link to="/login" style={{ fontWeight: 600 }}>← Back to Login</Link>
+        <p className="login-register">
+          <Link to="/login">← Back to Login</Link>
         </p>
       </div>
     </div>

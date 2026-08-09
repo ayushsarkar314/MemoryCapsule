@@ -5,36 +5,38 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import FriendPickerModal from '../components/FriendPickerModal';
 import AISuggestPanel from '../components/AISuggestPanel';
+import ShaderBackground from '../components/ShaderBackground';
+import './LandingPage.css';
 
 const CONTENT_TYPES = [
-  { key: 'text', icon: 'fa-solid fa-file-signature', label: 'Text' },
-  { key: 'image', icon: 'fa-solid fa-image', label: 'Image' },
-  { key: 'voice', icon: 'fa-solid fa-microphone-lines', label: 'Voice' },
-  { key: 'video', icon: 'fa-solid fa-video', label: 'Video' },
+  { key: 'text', icon: 'subject', label: 'Text' },
+  { key: 'image', icon: 'image', label: 'Image' },
+  { key: 'voice', icon: 'mic', label: 'Voice' },
+  { key: 'video', icon: 'videocam', label: 'Video' },
 ];
 
 const RULES = [
   {
     key: 'unlockAt',
-    icon: 'fa-solid fa-unlock-keyhole',
+    icon: 'calendar_clock',
     title: 'Unlock at a future time',
     desc: 'Capsule stays sealed until the date you set.',
   },
   {
     key: 'destroyAfterView',
-    icon: 'fa-solid fa-bomb',
+    icon: 'visibility_off',
     title: 'Destroy after one view',
     desc: 'Opens once, then it\'s gone forever.',
   },
   {
     key: 'expireAt',
-    icon: 'fa-solid fa-hourglass-end',
+    icon: 'hourglass_bottom',
     title: 'Auto-expire on a date',
     desc: 'Content disappears on schedule.',
   },
   {
     key: 'eventName',
-    icon: 'fa-solid fa-flag-checkered',
+    icon: 'flag',
     title: 'Unlock on an event',
     desc: 'Stays locked until you (or a date) triggers it.',
   },
@@ -316,101 +318,199 @@ const CreatePage = () => {
   const minDate = new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16);
 
   return (
-    <div className="create-forest-layout">
-      <div className="container">
-        <h1 className="forest-title">Create a Capsule</h1>
+    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* ── Live Shader Background + Readability Overlay ── */}
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+
+      <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '840px', margin: '0 auto' }}>
+        
+        {/* Page Header */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <span className="lp-eyebrow" style={{ marginBottom: '12px' }}>Sanctum</span>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700, color: '#1d1b19', marginBottom: '8px' }}>
+            Seal a Memory
+          </h1>
+          <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '16px', maxWidth: '520px', margin: '0 auto' }}>
+            Create it. Choose its fate. Let time preserve your thoughts for later.
+          </p>
+        </div>
 
         {/* AI Suggest Panel — appears above the steps */}
         <AISuggestPanel onUseSuggestion={handleAISuggestion} />
 
         {/* Step indicators */}
-        <div className="forest-step-indicator">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', margin: '32px 0 28px' }}>
           {['Content', 'Rules', 'Share'].map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`forest-step-dot ${step === i + 1 ? 'active' : step > i + 1 ? 'completed' : 'pending'}`}>
+            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: 700,
+                background: step === i + 1 ? '#7a545f' : step > i + 1 ? '#603d48' : 'rgba(237, 231, 227, 0.8)',
+                color: step <= i + 1 && step !== i + 1 ? '#4f4447' : '#ffffff',
+                boxShadow: step === i + 1 ? '0 4px 14px rgba(122, 84, 95, 0.35)' : 'none',
+                transition: 'all 0.3s',
+              }}>
                 {step > i + 1 ? '✓' : i + 1}
               </div>
               <span style={{
-                fontSize: '0.85rem',
-                fontWeight: step === i + 1 ? 700 : 500,
-                color: step === i + 1 ? 'var(--color-sunbeam)' : 'rgba(255,255,255,0.6)',
+                fontFamily: 'Manrope, sans-serif',
+                fontSize: '14px',
+                fontWeight: step === i + 1 ? 700 : 600,
+                color: step === i + 1 ? '#7a545f' : '#4f4447',
                 letterSpacing: '0.02em'
               }}>
                 {s}
               </span>
               {i < 2 && (
                 <div style={{
-                  width: 30,
+                  width: 40,
                   height: 2,
-                  background: step > i + 1 ? '#fff' : 'rgba(255,255,255,0.2)',
-                  borderRadius: 1
+                  background: step > i + 1 ? '#7a545f' : 'rgba(122, 84, 95, 0.2)',
+                  borderRadius: 2
                 }} />
               )}
             </div>
           ))}
         </div>
 
-        <div className="mossy-panel">
+        {/* Form Container */}
+        <div className="lp-glass-card" style={{ padding: '40px', borderRadius: '32px' }}>
 
           {/* STEP 1: Content */}
           {step === 1 && (
             <div style={{ animation: 'slideUp 300ms ease' }}>
-              <h4 style={{ marginBottom: 'var(--space-6)' }}>What's in this capsule?</h4>
+              <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '24px', fontWeight: 600, color: '#1d1b19', marginBottom: '24px' }}>
+                01 — What's in this capsule?
+              </h3>
 
-              <div className="form-group">
-                <label className="form-label">Capsule Title</label>
-                <input className="form-input" placeholder="Give it a meaningful name…" value={title} onChange={e => setTitle(e.target.value)} />
+              <div className="form-group" style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>
+                  Capsule Title
+                </label>
+                <input
+                  className="form-input"
+                  placeholder="Give it a meaningful name…"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 18px',
+                    borderRadius: '14px',
+                    border: '1px solid rgba(122, 84, 95, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.85)',
+                    color: '#1d1b19',
+                    fontFamily: 'Manrope, sans-serif',
+                    fontSize: '15px',
+                    outline: 'none',
+                  }}
+                />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Content Type</label>
-                <div className="content-type-grid">
+              <div className="form-group" style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '12px' }}>
+                  Content Type
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                   {CONTENT_TYPES.map(({ key, icon, label }) => (
-                    <button key={key} className={`content-type-btn ${contentType === key ? 'selected' : ''}`} onClick={() => { setContentType(key); setMediaFile(null); }}>
-                      <span className="icon"><i className={icon}></i></span>
-                      <span>{label}</span>
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => { setContentType(key); setMediaFile(null); }}
+                      style={{
+                        padding: '16px 12px',
+                        borderRadius: '20px',
+                        border: contentType === key ? '2px solid #7a545f' : '1px solid rgba(122, 84, 95, 0.15)',
+                        background: contentType === key ? 'rgba(122, 84, 95, 0.12)' : 'rgba(255, 255, 255, 0.65)',
+                        color: contentType === key ? '#7a545f' : '#4f4447',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.25s',
+                        boxShadow: contentType === key ? '0 4px 12px rgba(122, 84, 95, 0.15)' : 'none',
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>{icon}</span>
+                      <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: '13px', fontWeight: 600 }}>{label}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {contentType === 'text' ? (
-                <div className="form-group">
-                  <label className="form-label">Your Message</label>
-                  <textarea className="form-textarea" rows={6} placeholder="Write your memory, thought, or message…" value={textContent} onChange={e => setTextContent(e.target.value)} />
+                <div className="form-group" style={{ marginBottom: '28px' }}>
+                  <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>
+                    Your Message
+                  </label>
+                  <textarea
+                    rows={6}
+                    placeholder="Write your memory, thought, or message…"
+                    value={textContent}
+                    onChange={e => setTextContent(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 18px',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(122, 84, 95, 0.22)',
+                      background: 'rgba(255, 255, 255, 0.85)',
+                      color: '#1d1b19',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontSize: '15px',
+                      lineHeight: '1.6',
+                      outline: 'none',
+                      resize: 'vertical',
+                    }}
+                  />
                 </div>
               ) : (
-                <div className="form-group" style={{ animation: 'fadeIn 0.3s ease' }}>
-                  <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
-                    <label className="form-label" style={{ marginBottom: 0 }}>Content</label>
-                    <span className="text-xs text-muted">Upload or Record Live</span>
+                <div className="form-group" style={{ marginBottom: '28px', animation: 'fadeIn 0.3s ease' }}>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
+                    <label style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19' }}>Content</label>
+                    <span style={{ fontSize: '12px', color: '#4f4447' }}>Upload or Record Live</span>
                   </div>
 
-                  <div className="dropzone-container" style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative' }}>
                     {/* Recording/Capture UI */}
                     {(contentType === 'voice' || contentType === 'video' || contentType === 'image') && (
-                      <div className="recorder-section" style={{ marginBottom: 'var(--space-4)' }}>
+                      <div style={{ marginBottom: '16px' }}>
                         {recordingStatus === 'idle' ? (
-                          <button className="btn btn-ghost w-full" style={{ border: '2px dashed var(--color-sand)', padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)' }} onClick={startCamera}>
-                            <i className={contentType === 'voice' ? 'fa-solid fa-microphone-lines' : contentType === 'image' ? 'fa-solid fa-camera' : 'fa-solid fa-video'} style={{ fontSize: '1.5rem', marginRight: 'var(--space-2)' }}></i>
-                            Enable {contentType === 'voice' ? 'Microphone' : 'Camera'}
+                          <button
+                            type="button"
+                            className="lp-btn-outline"
+                            style={{ width: '100%', padding: '24px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyCenter: 'center', gap: '10px', marginTop: 0 }}
+                            onClick={startCamera}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>
+                              {contentType === 'voice' ? 'mic' : contentType === 'image' ? 'photo_camera' : 'videocam'}
+                            </span>
+                            <span>Enable {contentType === 'voice' ? 'Microphone' : 'Camera'}</span>
                           </button>
                         ) : (
-                          <div className="recorder-active" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+                          <div style={{ padding: '20px', borderRadius: '20px', background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(122, 84, 95, 0.2)' }}>
+                            <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
                               <div className="flex items-center gap-2">
                                 <div className={`record-dot ${isRecording ? 'pulse' : ''} ${recordingStatus === 'open' ? 'ready' : ''}`} />
-                                <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                                <span style={{ fontWeight: 600, fontSize: '14px', color: '#1d1b19' }}>
                                   {recordingStatus === 'open' ? 'Ready' : isRecording ? 'Recording...' : 'Preview Capture'}
                                 </span>
                               </div>
                               {(contentType === 'video' || contentType === 'voice') && (
-                                <span className="font-mono" style={{ fontSize: '0.9rem', color: 'var(--color-rose)' }}>{formatTime(recordTimer)}</span>
+                                <span style={{ fontFamily: 'monospace', fontSize: '14px', color: '#7a545f', fontWeight: 700 }}>{formatTime(recordTimer)}</span>
                               )}
                             </div>
 
                             {/* Live/Preview Displays */}
-                            <div style={{ marginBottom: 'var(--space-4)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#000' }}>
+                            <div style={{ marginBottom: '16px', borderRadius: '14px', overflow: 'hidden', background: '#000' }}>
                               {(contentType === 'video' || contentType === 'image') && (
                                 <>
                                   {recordingStatus === 'preview' && contentType === 'image' ? (
@@ -437,10 +537,10 @@ const CreatePage = () => {
                                 </>
                               )}
                               {contentType === 'voice' && recordingStatus === 'preview' && recordedUrl && (
-                                <audio controls src={recordedUrl} style={{ width: '100%', padding: 'var(--space-2)' }} />
+                                <audio controls src={recordedUrl} style={{ width: '100%', padding: '12px' }} />
                               )}
                               {contentType === 'voice' && (recordingStatus === 'recording' || recordingStatus === 'open') && (
-                                <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyCenter: 'center', color: '#fff' }}>
                                   <div className="voice-waves">
                                     <span style={{ animationPlayState: isRecording ? 'running' : 'paused' }} />
                                     <span style={{ animationPlayState: isRecording ? 'running' : 'paused' }} />
@@ -455,19 +555,19 @@ const CreatePage = () => {
                             <div className="flex gap-2">
                               {recordingStatus === 'open' ? (
                                 <>
-                                  <button className="btn btn-ghost w-full" onClick={resetRecording}>Cancel</button>
+                                  <button type="button" className="lp-btn-outline" style={{ width: '100%', marginTop: 0 }} onClick={resetRecording}>Cancel</button>
                                   {contentType === 'image' ? (
-                                    <button className="btn btn-primary w-full" onClick={takePhoto}>Take Photo</button>
+                                    <button type="button" className="lp-btn-primary" style={{ width: '100%' }} onClick={takePhoto}>Take Photo</button>
                                   ) : (
-                                    <button className="btn btn-primary w-full" onClick={startRecording}>Start Recording</button>
+                                    <button type="button" className="lp-btn-primary" style={{ width: '100%' }} onClick={startRecording}>Start Recording</button>
                                   )}
                                 </>
                               ) : isRecording ? (
-                                <button className="btn btn-rose w-full" onClick={stopRecording}>Stop Recording</button>
+                                <button type="button" className="lp-btn-primary" style={{ width: '100%', background: '#ba1a1a' }} onClick={stopRecording}>Stop Recording</button>
                               ) : (
                                 <>
-                                  <button className="btn btn-ghost w-full" onClick={resetRecording}>Retake</button>
-                                  <button className="btn btn-sage w-full" onClick={() => toast.success('Captured! Ready to seal.')}>Keep This</button>
+                                  <button type="button" className="lp-btn-outline" style={{ width: '100%', marginTop: 0 }} onClick={resetRecording}>Retake</button>
+                                  <button type="button" className="lp-btn-primary" style={{ width: '100%' }} onClick={() => toast.success('Captured! Ready to seal.')}>Keep This</button>
                                 </>
                               )}
                             </div>
@@ -476,20 +576,38 @@ const CreatePage = () => {
                       </div>
                     )}
 
-                    {/* Standard Dropzone (Always available as alternative) */}
+                    {/* Standard Dropzone */}
                     {recordingStatus === 'idle' && (
-                      <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : ''}`}>
+                      <div
+                        {...getRootProps()}
+                        style={{
+                          border: '2px dashed rgba(122, 84, 95, 0.3)',
+                          borderRadius: '20px',
+                          padding: '32px 20px',
+                          textAlign: 'center',
+                          background: isDragActive ? 'rgba(122, 84, 95, 0.08)' : 'rgba(255, 255, 255, 0.5)',
+                          cursor: 'pointer',
+                          transition: 'all 0.25s',
+                        }}
+                      >
                         <input {...getInputProps()} />
                         {mediaFile ? (
                           <div>
-                            <p style={{ fontWeight: 600, marginBottom: 'var(--space-1)' }}>✅ {mediaFile.name}</p>
-                            <p className="text-xs text-muted">{(mediaFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                            <button className="text-xs text-rose" style={{ marginTop: 'var(--space-2)', border: 'none', background: 'none', cursor: 'pointer', textDecoration: 'underline' }} onClick={(e) => { e.stopPropagation(); setMediaFile(null); }}>Remove & upload other</button>
+                            <p style={{ fontWeight: 600, color: '#7a545f', marginBottom: '4px' }}>✅ {mediaFile.name}</p>
+                            <p style={{ fontSize: '12px', color: '#4f4447' }}>{(mediaFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                            <button
+                              type="button"
+                              style={{ marginTop: '8px', border: 'none', background: 'none', color: '#ba1a1a', cursor: 'pointer', textDecoration: 'underline', fontSize: '12px' }}
+                              onClick={(e) => { e.stopPropagation(); setMediaFile(null); }}
+                            >
+                              Remove & upload other
+                            </button>
                           </div>
                         ) : (
                           <div>
-                            <p style={{ fontSize: '1.2rem', marginBottom: 'var(--space-2)' }}>Or Upload File</p>
-                            <p className="text-sm text-muted">Drag & drop or click</p>
+                            <span className="material-symbols-outlined" style={{ fontSize: '36px', color: '#7a545f', marginBottom: '8px' }}>cloud_upload</span>
+                            <p style={{ fontSize: '15px', fontWeight: 600, color: '#1d1b19', marginBottom: '4px' }}>Or Upload File</p>
+                            <p style={{ fontSize: '13px', color: '#4f4447' }}>Drag & drop or click to choose</p>
                           </div>
                         )}
                       </div>
@@ -498,8 +616,8 @@ const CreatePage = () => {
                 </div>
               )}
 
-              <button className="btn btn-primary w-full" onClick={() => setStep(2)}>
-                Next: Set Rules →
+              <button type="button" className="lp-btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setStep(2)}>
+                Next: Set Rules <span className="material-symbols-outlined">arrow_forward</span>
               </button>
             </div>
           )}
@@ -507,60 +625,122 @@ const CreatePage = () => {
           {/* STEP 2: Rules */}
           {step === 2 && (
             <div style={{ animation: 'slideUp 300ms ease' }}>
-              <h4 style={{ marginBottom: 'var(--space-2)' }}>Choose a Lifecycle Rule</h4>
-              <p className="text-sm text-muted" style={{ marginBottom: 'var(--space-6)' }}>
+              <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '24px', fontWeight: 600, color: '#1d1b19', marginBottom: '8px' }}>
+                02 — Choose a Lifecycle Rule
+              </h3>
+              <p style={{ fontSize: '14px', color: '#4f4447', marginBottom: '24px' }}>
                 Every capsule must follow one rule. This determines when and how it can be opened.
               </p>
 
-              <div className="rule-selector" style={{ marginBottom: 'var(--space-6)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px', marginBottom: '24px' }}>
                 {RULES.map(({ key, icon, title: rTitle, desc }) => (
-                  <div key={key} className={`rule-option ${ruleType === key ? 'selected' : ''}`} onClick={() => { setRuleType(key); setRuleValue(''); }}>
-                    <span className="rule-option-icon"><i className={icon}></i></span>
+                  <div
+                    key={key}
+                    onClick={() => { setRuleType(key); setRuleValue(''); }}
+                    style={{
+                      padding: '20px',
+                      borderRadius: '20px',
+                      border: ruleType === key ? '2px solid #7a545f' : '1px solid rgba(122, 84, 95, 0.15)',
+                      background: ruleType === key ? 'rgba(122, 84, 95, 0.1)' : 'rgba(255, 255, 255, 0.65)',
+                      cursor: 'pointer',
+                      transition: 'all 0.25s',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '14px',
+                      boxShadow: ruleType === key ? '0 4px 12px rgba(122, 84, 95, 0.12)' : 'none',
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '28px', color: '#7a545f', flexShrink: 0 }}>{icon}</span>
                     <div>
-                      <p className="rule-option-title">{rTitle}</p>
-                      <p className="rule-option-desc">{desc}</p>
+                      <p style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '15px', color: '#1d1b19', marginBottom: '4px' }}>{rTitle}</p>
+                      <p style={{ fontSize: '12px', color: '#4f4447', lineHeight: '1.4' }}>{desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               {ruleType === 'unlockAt' && (
-                <div className="form-group">
-                  <label className="form-label">Unlock Date & Time</label>
-                  <input type="datetime-local" className="form-input" min={minDate} value={ruleValue} onChange={e => setRuleValue(e.target.value)} />
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>Unlock Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    className="form-input"
+                    min={minDate}
+                    value={ruleValue}
+                    onChange={e => setRuleValue(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 18px',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(122, 84, 95, 0.22)',
+                      background: 'rgba(255, 255, 255, 0.85)',
+                      color: '#1d1b19',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontSize: '15px',
+                    }}
+                  />
                 </div>
               )}
 
               {ruleType === 'expireAt' && (
-                <div className="form-group">
-                  <label className="form-label">Expiry Date & Time</label>
-                  <input type="datetime-local" className="form-input" min={minDate} value={ruleValue} onChange={e => setRuleValue(e.target.value)} />
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>Expiry Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    className="form-input"
+                    min={minDate}
+                    value={ruleValue}
+                    onChange={e => setRuleValue(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 18px',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(122, 84, 95, 0.22)',
+                      background: 'rgba(255, 255, 255, 0.85)',
+                      color: '#1d1b19',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontSize: '15px',
+                    }}
+                  />
                 </div>
               )}
 
               {ruleType === 'destroyAfterView' && (
-                <div style={{ padding: 'var(--space-4)', background: 'var(--color-blush)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)' }}>
-                  <p className="text-sm" style={{ color: 'var(--color-rose)' }}>
-                    ⚠️ This capsule will be permanently destroyed the moment it's opened. This cannot be undone.
+                <div style={{ padding: '16px 20px', background: 'rgba(186, 26, 26, 0.08)', borderRadius: '16px', marginBottom: '24px', border: '1px solid rgba(186, 26, 26, 0.2)' }}>
+                  <p style={{ fontSize: '14px', color: '#ba1a1a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
+                    This capsule will be permanently destroyed the moment it's opened. This cannot be undone.
                   </p>
                 </div>
               )}
 
               {ruleType === 'eventName' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
                   <div className="form-group">
-                    <label className="form-label">Event Name</label>
+                    <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>Event Name</label>
                     <input
                       className="form-input"
                       placeholder="e.g. GRADUATION, BIRTHDAY, NEW_JOB…"
                       value={eventName}
                       onChange={(e) => setEventName(e.target.value.toUpperCase())}
                       id="event-name-input"
+                      style={{
+                        width: '100%',
+                        padding: '14px 18px',
+                        borderRadius: '14px',
+                        border: '1px solid rgba(122, 84, 95, 0.22)',
+                        background: 'rgba(255, 255, 255, 0.85)',
+                        color: '#1d1b19',
+                        fontFamily: 'Manrope, sans-serif',
+                        fontSize: '15px',
+                      }}
                     />
-                    <p className="text-xs text-muted" style={{ marginTop: 'var(--space-1)' }}>You can manually trigger this capsule anytime from your vault.</p>
+                    <p style={{ fontSize: '12px', color: '#4f4447', marginTop: '6px' }}>You can manually trigger this capsule anytime from your vault.</p>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Auto-trigger Date <span style={{ opacity: 0.6, fontWeight: 400 }}>(optional)</span></label>
+                    <label style={{ display: 'block', fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '14px', color: '#1d1b19', marginBottom: '8px' }}>
+                      Auto-trigger Date <span style={{ opacity: 0.6, fontWeight: 400 }}>(optional)</span>
+                    </label>
                     <input
                       type="datetime-local"
                       className="form-input"
@@ -568,15 +748,29 @@ const CreatePage = () => {
                       value={eventTriggerDate}
                       onChange={(e) => setEventTriggerDate(e.target.value)}
                       id="event-trigger-date-input"
+                      style={{
+                        width: '100%',
+                        padding: '14px 18px',
+                        borderRadius: '14px',
+                        border: '1px solid rgba(122, 84, 95, 0.22)',
+                        background: 'rgba(255, 255, 255, 0.85)',
+                        color: '#1d1b19',
+                        fontFamily: 'Manrope, sans-serif',
+                        fontSize: '15px',
+                      }}
                     />
-                    <p className="text-xs text-muted" style={{ marginTop: 'var(--space-1)' }}>If set, capsule auto-unlocks on this date even if you haven't triggered it manually.</p>
+                    <p style={{ fontSize: '12px', color: '#4f4447', marginTop: '6px' }}>If set, capsule auto-unlocks on this date even if you haven't triggered it manually.</p>
                   </div>
                 </div>
               )}
 
               <div className="flex gap-3">
-                <button className="btn btn-ghost" onClick={() => setStep(1)}>← Back</button>
-                <button className="btn btn-primary w-full" onClick={() => validateRule() && setStep(3)}>Next: Share Options →</button>
+                <button type="button" className="lp-btn-outline" style={{ marginTop: 0 }} onClick={() => setStep(1)}>
+                  <span className="material-symbols-outlined">arrow_back</span> Back
+                </button>
+                <button type="button" className="lp-btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => validateRule() && setStep(3)}>
+                  Next: Share Options <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
               </div>
             </div>
           )}
@@ -584,34 +778,65 @@ const CreatePage = () => {
           {/* STEP 3: Share */}
           {step === 3 && (
             <div style={{ animation: 'slideUp 300ms ease' }}>
-              <h4 style={{ marginBottom: 'var(--space-2)' }}>Who gets this capsule?</h4>
-              <p className="text-sm text-muted" style={{ marginBottom: 'var(--space-6)' }}>
+              <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '24px', fontWeight: 600, color: '#1d1b19', marginBottom: '8px' }}>
+                03 — Who gets this capsule?
+              </h3>
+              <p style={{ fontSize: '14px', color: '#4f4447', marginBottom: '24px' }}>
                 Keep it in your personal vault, or send it to a friend.
               </p>
 
-              <div className="flex flex-col gap-3" style={{ marginBottom: 'var(--space-6)' }}>
-                <div className={`rule-option ${!recipientId ? 'selected' : ''}`} onClick={() => { setRecipientId(''); setRecipientName(''); }}>
-                  <span className="rule-option-icon"><i className="fa-solid fa-vault"></i></span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '28px' }}>
+                <div
+                  onClick={() => { setRecipientId(''); setRecipientName(''); }}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '20px',
+                    border: !recipientId ? '2px solid #7a545f' : '1px solid rgba(122, 84, 95, 0.15)',
+                    background: !recipientId ? 'rgba(122, 84, 95, 0.1)' : 'rgba(255, 255, 255, 0.65)',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#7a545f' }}>inventory_2</span>
                   <div>
-                    <p className="rule-option-title">Keep in my vault</p>
-                    <p className="rule-option-desc">Private, only for you.</p>
+                    <p style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '16px', color: '#1d1b19', marginBottom: '2px' }}>Keep in my vault</p>
+                    <p style={{ fontSize: '13px', color: '#4f4447', margin: 0 }}>Private, only accessible by you.</p>
                   </div>
                 </div>
-                <div className={`rule-option ${recipientId ? 'selected' : ''}`} onClick={() => setShowFriendPicker(true)}>
-                  <span className="rule-option-icon"><i className="fa-solid fa-paper-plane"></i></span>
+
+                <div
+                  onClick={() => setShowFriendPicker(true)}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '20px',
+                    border: recipientId ? '2px solid #7a545f' : '1px solid rgba(122, 84, 95, 0.15)',
+                    background: recipientId ? 'rgba(122, 84, 95, 0.1)' : 'rgba(255, 255, 255, 0.65)',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#7a545f' }}>send</span>
                   <div>
-                    <p className="rule-option-title">
-                      Send to a friend {recipientId && <span style={{ color: 'var(--color-sunbeam)' }}>→ {recipientName}</span>}
+                    <p style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 600, fontSize: '16px', color: '#1d1b19', marginBottom: '2px' }}>
+                      Send to a friend {recipientId && <span style={{ color: '#7a545f', fontWeight: 700 }}>→ {recipientName}</span>}
                     </p>
-                    <p className="rule-option-desc">Delivered to their received capsules.</p>
+                    <p style={{ fontSize: '13px', color: '#4f4447', margin: 0 }}>Delivered to their received capsules.</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <button className="btn btn-ghost" onClick={() => setStep(2)}>← Back</button>
-                <button className="btn btn-primary w-full" onClick={handleSubmit} disabled={loading}>
-                  {loading ? <><span className="spinner" /> Sealing capsule…</> : '🫙 Seal & Save'}
+                <button type="button" className="lp-btn-outline" style={{ marginTop: 0 }} onClick={() => setStep(2)}>
+                  <span className="material-symbols-outlined">arrow_back</span> Back
+                </button>
+                <button type="button" className="lp-btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={handleSubmit} disabled={loading}>
+                  {loading ? <>Sealing capsule…</> : <>Seal & Save <span className="material-symbols-outlined">lock</span></>}
                 </button>
               </div>
             </div>
@@ -626,7 +851,7 @@ const CreatePage = () => {
         />
       )}
 
-      {/* Success Animation Overlay (Refined Blue Postman Delivery) */}
+      {/* Success Animation Overlay */}
       {showSuccess && (
         <div className="success-overlay">
           <div className="postman-sequence">

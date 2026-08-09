@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import ShaderBackground from '../components/ShaderBackground';
+import './LoginPage.css';
 
 const RegisterPage = () => {
   const { register } = useAuth();
@@ -30,51 +32,58 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Create your vault</h1>
-          <p className="text-muted text-sm">Capture moments, send them into time</p>
+    <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+
+      <div className="login-card lp-glass-card">
+        <div className="login-header">
+          <div className="login-logo">✦</div>
+          <h1>Create your vault</h1>
+          <p>Capture moments, send them into time</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="username">Username *</label>
-              <input id="username" name="username" type="text" className="form-input"
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="login-form-group">
+              <label htmlFor="username">Username *</label>
+              <input id="username" name="username" type="text"
                 placeholder="@you" value={form.username} onChange={handleChange} />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="displayName">Display Name</label>
-              <input id="displayName" name="displayName" type="text" className="form-input"
+            <div className="login-form-group">
+              <label htmlFor="displayName">Display Name</label>
+              <input id="displayName" name="displayName" type="text"
                 placeholder="Your name" value={form.displayName} onChange={handleChange} />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email *</label>
-            <input id="email" name="email" type="email" className="form-input"
+          <div className="login-form-group">
+            <label htmlFor="email">Email *</label>
+            <input id="email" name="email" type="email"
               placeholder="you@example.com" value={form.email} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="reg-password">Password *</label>
-            <input id="reg-password" name="password" type="password" className="form-input"
+          <div className="login-form-group">
+            <label htmlFor="reg-password">Password *</label>
+            <input id="reg-password" name="password" type="password"
               placeholder="Min. 6 characters" value={form.password} onChange={handleChange} />
           </div>
 
           <button id="register-submit" type="submit"
-            className="btn btn-primary w-full"
-            style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)' }}
+            className="login-button"
             disabled={loading}>
-            {loading ? <><span className="spinner" /> Creating vault…</> : 'Create My Vault'}
+            {loading ? <><span className="login-spinner" /> Creating vault…</> : 'Create My Vault'}
           </button>
         </form>
 
-        <div className="divider" />
-        <p className="text-center text-sm text-muted">
+        <div className="login-divider">
+          <span>or</span>
+        </div>
+        <p className="login-register">
           Already have an account?{' '}
-          <Link to="/login" style={{ fontWeight: 600 }}>Sign in</Link>
+          <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>

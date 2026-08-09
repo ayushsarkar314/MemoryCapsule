@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import ShaderBackground from '../components/ShaderBackground';
+import './LoginPage.css';
 
 const ResetPasswordPage = () => {
   const [searchParams]  = useSearchParams();
@@ -46,14 +48,18 @@ const ResetPasswordPage = () => {
   /* Invalid / missing token guard */
   if (!token) {
     return (
-      <div className="auth-page">
-        <div className="auth-card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-4)' }}>⚠️</div>
-          <h2 style={{ marginBottom: 'var(--space-3)' }}>Invalid Reset Link</h2>
-          <p className="text-muted text-sm" style={{ marginBottom: 'var(--space-6)' }}>
+      <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
+        <div className="lp-bg">
+          <ShaderBackground />
+          <div className="lp-bg-overlay" />
+        </div>
+        <div className="login-card lp-glass-card" style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>⚠️</div>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', marginBottom: '12px', color: '#1d1b19' }}>Invalid Reset Link</h2>
+          <p style={{ fontFamily: 'Manrope, sans-serif', color: '#4f4447', fontSize: '0.9rem', marginBottom: '24px' }}>
             This reset link is missing or malformed.
           </p>
-          <Link to="/forgot-password" className="btn btn-primary">
+          <Link to="/forgot-password" className="login-button" style={{ display: 'inline-block', textDecoration: 'none' }}>
             Request a New Link
           </Link>
         </div>
@@ -62,24 +68,29 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        {/* Logo */}
-        <div className="text-center" style={{ marginBottom: 'var(--space-8)' }}>
-          <h1 style={{ fontSize: '1.8rem', marginBottom: 'var(--space-2)' }}>Reset Password</h1>
-          <p className="text-muted text-sm">Choose a strong new password for your account</p>
+    <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
+
+      <div className="login-card lp-glass-card">
+        {/* Header */}
+        <div className="login-header">
+          <div className="login-logo">✦</div>
+          <h1>Reset Password</h1>
+          <p>Choose a strong new password for your account</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           {/* New Password */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="reset-new-password">New Password</label>
+          <div className="login-form-group">
+            <label htmlFor="reset-new-password">New Password</label>
             <div style={{ position: 'relative' }}>
               <input
                 id="reset-new-password"
                 name="newPassword"
                 type={showNew ? 'text' : 'password'}
-                className="form-input"
                 placeholder="Min. 6 characters"
                 value={form.newPassword}
                 onChange={handleChange}
@@ -92,7 +103,7 @@ const ResetPasswordPage = () => {
                 style={{
                   position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
                   background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem',
-                  color: 'var(--color-text-muted)', padding: '0 0.25rem',
+                  color: '#4f4447', padding: '0 0.25rem',
                 }}
                 aria-label={showNew ? 'Hide password' : 'Show password'}
               >
@@ -102,14 +113,13 @@ const ResetPasswordPage = () => {
           </div>
 
           {/* Confirm Password */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="reset-confirm-password">Confirm New Password</label>
+          <div className="login-form-group">
+            <label htmlFor="reset-confirm-password">Confirm New Password</label>
             <div style={{ position: 'relative' }}>
               <input
                 id="reset-confirm-password"
                 name="confirmPassword"
                 type={showConfirm ? 'text' : 'password'}
-                className="form-input"
                 placeholder="Re-enter new password"
                 value={form.confirmPassword}
                 onChange={handleChange}
@@ -122,7 +132,7 @@ const ResetPasswordPage = () => {
                 style={{
                   position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
                   background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem',
-                  color: 'var(--color-text-muted)', padding: '0 0.25rem',
+                  color: '#4f4447', padding: '0 0.25rem',
                 }}
                 aria-label={showConfirm ? 'Hide password' : 'Show password'}
               >
@@ -133,7 +143,7 @@ const ResetPasswordPage = () => {
             {/* Match indicator */}
             {form.confirmPassword && (
               <p style={{
-                marginTop: 'var(--space-1)', fontSize: '0.78rem',
+                marginTop: '6px', fontSize: '0.8rem', fontFamily: 'Manrope, sans-serif', fontWeight: 600,
                 color: form.newPassword === form.confirmPassword ? '#22c55e' : '#ef4444',
               }}>
                 {form.newPassword === form.confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
@@ -144,18 +154,17 @@ const ResetPasswordPage = () => {
           <button
             id="reset-submit"
             type="submit"
-            className="btn btn-primary w-full"
-            style={{ marginTop: 'var(--space-2)', padding: 'var(--space-4)' }}
+            className="login-button"
             disabled={loading}
           >
-            {loading ? <><span className="spinner" />  Resetting…</> : 'Set New Password'}
+            {loading ? <><span className="login-spinner" />  Resetting…</> : 'Set New Password'}
           </button>
         </form>
 
-        <div className="divider" />
+        <div className="login-divider" />
 
-        <p className="text-center text-sm text-muted">
-          <Link to="/login" style={{ fontWeight: 600 }}>← Back to Login</Link>
+        <p className="login-register">
+          <Link to="/login">← Back to Login</Link>
         </p>
       </div>
     </div>

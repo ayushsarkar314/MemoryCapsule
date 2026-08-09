@@ -3,9 +3,9 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const RULE_LABELS = {
-  unlockAt: { icon: 'fa-solid fa-unlock-keyhole', color: '#6c8ebf' },
-  expireAt: { icon: 'fa-solid fa-hourglass-end', color: '#e67e22' },
-  destroyAfterView: { icon: 'fa-solid fa-bomb', color: '#e74c3c' },
+  unlockAt: { icon: 'fa-solid fa-unlock-keyhole', color: '#7a545f' },
+  expireAt: { icon: 'fa-solid fa-hourglass-end', color: '#b8643a' },
+  destroyAfterView: { icon: 'fa-solid fa-bomb', color: '#c97878' },
   eventName: { icon: 'fa-solid fa-flag-checkered', color: '#8e44ad' },
 };
 
