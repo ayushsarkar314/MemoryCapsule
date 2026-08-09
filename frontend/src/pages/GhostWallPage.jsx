@@ -57,10 +57,9 @@ const GhostTimer = ({ expiresAt }) => {
   }, [expiresAt]);
 
   return (
-    <span className="gw-timer">
-      <span className="gw-timer-icon">⏳</span>
-      {remaining}
-    </span>
+    <div className="gw-timer">
+      ⏳ {remaining}
+    </div>
   );
 };
 
@@ -196,32 +195,26 @@ const GhostWallPage = () => {
   };
 
   return (
-    /*
-     * IMPORTANT:
-     * We keep your original `lp-root create-shader-bg`
-     * classes untouched.
-     *
-     * We DO NOT set a background on this element.
-     */
     <div
-      className="lp-root create-shader-bg gw-page"
+      className="lp-root"
       style={{
         minHeight: '100vh',
         position: 'relative',
       }}
     >
-      {/* =====================================================
-          YOUR EXISTING LIVE SHADER BACKGROUND
-          DO NOT CHANGE THIS
-          ===================================================== */}
-
-      <ShaderBackground />
 
       {/* =====================================================
-          GHOST WALL UI
-          Only this layer gets the new styling
+          SAME BACKGROUND AS CREATE / SHARED PAGE
           ===================================================== */}
+      <div className="lp-bg">
+        <ShaderBackground />
+        <div className="lp-bg-overlay" />
+      </div>
 
+
+      {/* =====================================================
+          GHOST WALL CONTENT
+          ===================================================== */}
       <div className="gw-content">
 
         <main className="gw-container">
@@ -354,6 +347,7 @@ const GhostWallPage = () => {
                       : 'gw-upload'
                   }
                 >
+
                   <input {...getInputProps()} />
 
                   {mediaFile ? (
@@ -391,6 +385,7 @@ const GhostWallPage = () => {
                       </small>
                     </>
                   )}
+
                 </div>
               )}
 
@@ -449,6 +444,7 @@ const GhostWallPage = () => {
           {/* ================= POSTS ================= */}
 
           {loading ? (
+
             <div className="gw-post-list">
 
               {[1, 2, 3].map((item) => (
@@ -463,6 +459,7 @@ const GhostWallPage = () => {
               ))}
 
             </div>
+
           ) : posts.length === 0 ? (
 
             <section className="gw-card gw-empty">
@@ -491,26 +488,32 @@ const GhostWallPage = () => {
               </button>
 
             </section>
+
           ) : (
 
             <div className="gw-post-list">
 
               {posts.map((post) => (
+
                 <article
                   key={post._id}
                   className="gw-card gw-post"
                 >
 
                   {post.contentType === 'text' ? (
+
                     <p className="gw-post-text">
                       {post.textContent}
                     </p>
+
                   ) : post.mediaUrl ? (
+
                     <img
                       src={post.mediaUrl}
                       alt="Ghost post"
                       className="gw-post-image"
                     />
+
                   ) : null}
 
 
@@ -524,6 +527,7 @@ const GhostWallPage = () => {
 
                       {REACTIONS.map(
                         ([key, emoji]) => (
+
                           <button
                             type="button"
                             key={key}
@@ -535,21 +539,19 @@ const GhostWallPage = () => {
                               )
                             }
                           >
+
                             <span>
                               {emoji}
                             </span>
 
-                            {post.reactions?.[key] >
-                              0 && (
+                            {post.reactions?.[key] > 0 && (
                               <span>
-                                {
-                                  post.reactions[
-                                    key
-                                  ]
-                                }
+                                {post.reactions[key]}
                               </span>
                             )}
+
                           </button>
+
                         )
                       )}
 
@@ -558,14 +560,17 @@ const GhostWallPage = () => {
                   </div>
 
                 </article>
+
               ))}
 
             </div>
+
           )}
 
         </main>
 
       </div>
+
     </div>
   );
 };

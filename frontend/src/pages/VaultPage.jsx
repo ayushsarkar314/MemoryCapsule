@@ -138,7 +138,7 @@ const VaultPage = () => {
                 <div style={{ textAlign: 'center', padding: 'var(--space-16) 0' }}>
                   <div style={{ fontSize: '4rem', opacity: 0.3, marginBottom: 'var(--space-4)', color: 'var(--color-rose)' }}>✈️</div>
                   <h3 className="text-high-contrast">No {activeTab} travel moments yet</h3>
-                  <p className="text-muted">Every mile has a story. Seal yours today.</p>
+                 
                 </div>
               ) : (
                 <div className="vault-grid">
