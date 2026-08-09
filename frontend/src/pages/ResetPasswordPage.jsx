@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import ShaderBackground from '../components/ShaderBackground';
 import './LoginPage.css';
 
 const ResetPasswordPage = () => {
@@ -49,10 +48,6 @@ const ResetPasswordPage = () => {
   if (!token) {
     return (
       <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
-        <div className="lp-bg">
-          <ShaderBackground />
-          <div className="lp-bg-overlay" />
-        </div>
         <div className="login-card lp-glass-card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>⚠️</div>
           <h2 style={{ fontFamily: 'Playfair Display, serif', marginBottom: '12px', color: '#1d1b19' }}>Invalid Reset Link</h2>
@@ -69,11 +64,6 @@ const ResetPasswordPage = () => {
 
   return (
     <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
-
       <div className="login-card lp-glass-card">
         {/* Header */}
         <div className="login-header">

@@ -3,7 +3,6 @@ import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import ShaderBackground from '../components/ShaderBackground';
 import './LandingPage.css';
 
 const ProfilePage = () => {
@@ -84,12 +83,6 @@ const ProfilePage = () => {
 
   return (
     <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
-      {/* ── Live Shader Background + Readability Overlay ── */}
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
-
       <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '640px', margin: '0 auto' }}>
         
         {/* Header */}

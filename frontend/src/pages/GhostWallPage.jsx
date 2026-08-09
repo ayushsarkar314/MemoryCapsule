@@ -115,14 +115,14 @@ const GhostWallPage = () => {
   };
 
   return (
-    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
-      {/* ── Live Shader Background + Readability Overlay ── */}
+    <div className="lp-root create-shader-bg" style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* ── WebGL Shader Background ── */}
       <div className="lp-bg">
         <ShaderBackground />
         <div className="lp-bg-overlay" />
       </div>
 
-      <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '780px', margin: '0 auto' }}>
+      <div className="container page-content" style={{ position: 'relative', zIndex: 10, paddingTop: '100px', paddingBottom: '64px', maxWidth: '780px', margin: '0 auto' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>

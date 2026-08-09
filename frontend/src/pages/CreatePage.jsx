@@ -318,14 +318,15 @@ const CreatePage = () => {
   const minDate = new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16);
 
   return (
-    <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
-      {/* ── Live Shader Background + Readability Overlay ── */}
+    <div className="lp-root create-shader-bg" style={{ minHeight: '100vh', position: 'relative' }}>
+      {/* ── Live Shader Background + Dark Readability Overlay ── */}
       <div className="lp-bg">
         <ShaderBackground />
         <div className="lp-bg-overlay" />
       </div>
 
       <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '840px', margin: '0 auto' }}>
+
         
         {/* Page Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>

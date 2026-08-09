@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import ShaderBackground from '../components/ShaderBackground';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -45,11 +44,6 @@ const LoginPage = () => {
 
   return (
     <div className="lp-root login-page" style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
-
       <div className="login-card lp-glass-card">
 
         {/* Logo / Brand */}

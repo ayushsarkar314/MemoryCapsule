@@ -5,7 +5,6 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import Countdown from '../components/Countdown';
-import ShaderBackground from '../components/ShaderBackground';
 import './LandingPage.css';
 
 const CapsuleViewPage = () => {
@@ -55,20 +54,12 @@ const CapsuleViewPage = () => {
 
   if (loading) return (
     <div className="lp-root" style={{ minHeight: '100vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
       <div className="ai-loading-orb" style={{ zIndex: 2 }} />
     </div>
   );
 
   if (error) return (
     <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
       <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '120px', paddingBottom: '64px', maxWidth: '520px', margin: '0 auto', textAlign: 'center' }}>
         <div className="lp-glass-card" style={{ padding: '40px', borderRadius: '32px' }}>
           <div style={{ fontSize: '4rem', marginBottom: '16px' }}>
@@ -102,12 +93,6 @@ const CapsuleViewPage = () => {
 
   return (
     <div className="lp-root" style={{ minHeight: '100vh', position: 'relative' }}>
-      {/* ── Live Shader Background + Readability Overlay ── */}
-      <div className="lp-bg">
-        <ShaderBackground />
-        <div className="lp-bg-overlay" />
-      </div>
-
       <div className="container page-content" style={{ position: 'relative', zIndex: 2, paddingTop: '100px', paddingBottom: '64px', maxWidth: '720px', margin: '0 auto' }}>
         <button className="lp-btn-outline" onClick={() => navigate(-1)} style={{ marginBottom: '24px', padding: '8px 20px', fontSize: '13px' }}>
           ← Back

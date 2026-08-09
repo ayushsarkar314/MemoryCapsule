@@ -14,94 +14,179 @@ export default function ShaderBackground() {
 
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const gl = canvas.getContext('webgl');
-    if (!gl) return;
 
-    const vsSource = `
-      attribute vec4 aVertexPosition;
-      varying vec2 v_texCoord;
-      void main() {
-        gl_Position = aVertexPosition;
-        v_texCoord = aVertexPosition.xy * 0.5 + 0.5;
+    function syncSize() {
+      if (!canvas) return;
+      const w = canvas.clientWidth || window.innerWidth || 1280;
+      const h = canvas.clientHeight || window.innerHeight || 720;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
       }
-    `;
-
-    const fsSource = `
-      precision highp float;
-      varying vec2 v_texCoord;
-      uniform float u_time;
-      uniform vec2 u_resolution;
-
-      void main() {
-        vec2 uv = v_texCoord;
-        float movement  = sin(uv.x * 2.5 + u_time * 0.4) * cos(uv.y * 1.5 - u_time * 0.3);
-        float movement2 = sin(uv.y * 3.5 + u_time * 0.3) * cos(uv.x * 4.5 - u_time * 0.2);
-        vec3 deepPlum   = vec3(0.20, 0.10, 0.25);
-        vec3 softPurple = vec3(0.58, 0.44, 0.65);
-        vec3 vividPurple= vec3(0.45, 0.25, 0.55);
-        vec3 creamGlow  = vec3(0.99, 0.97, 0.95);
-        vec3 color = mix(deepPlum, softPurple, uv.y + movement * 0.3);
-        color = mix(color, vividPurple, uv.x + movement2 * 0.2);
-        float glow = 1.0 - length(uv - vec2(0.8, 0.9));
-        color += creamGlow * pow(max(0.0, glow), 3.5) * 0.4;
-        float grain = fract(sin(dot(uv + u_time * 0.01, vec2(12.9898, 78.233))) * 43758.5453);
-        color += (grain - 0.5) * 0.015;
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `;
-
-    function compileShader(gl, type, source) {
-      const shader = gl.createShader(type);
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-      return shader;
     }
 
-    const vertexShader   = compileShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fsSource);
-    if (!vertexShader || !fragmentShader) return;
+    let observer;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(syncSize);
+      observer.observe(canvas);
+    }
+    syncSize();
 
-    const program = gl.createProgram();
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-    gl.useProgram(program);
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
 
-    const posLoc = gl.getAttribLocation(program, 'aVertexPosition');
-    const resLoc = gl.getUniformLocation(program, 'u_resolution');
-    const timeLoc = gl.getUniformLocation(program, 'u_time');
+    const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+
+    const fs = `precision highp float;
+
+varying vec2 v_texCoord;
+
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+
+// Helper for random noise
+float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+void main() {
+    vec2 uv = v_texCoord;
+    vec2 centered_uv = (uv - 0.5) * 2.0;
+    centered_uv.x *= u_resolution.x / u_resolution.y;
+
+    // Base deep purple/magenta background colors from the image
+    vec3 color1 = vec3(0.05, 0.0, 0.1); // Deep dark purple
+    vec3 color2 = vec3(0.2, 0.0, 0.3); // Rich mid purple
+    vec3 color3 = vec3(0.4, 0.0, 0.5); // Bright purple glow
+
+    // Atmospheric glow movement
+    float glow = sin(u_time * 0.5 + uv.x * 2.0) * 0.5 + 0.5;
+    vec3 bg_color = mix(color1, color2, glow * 0.5);
+    bg_color = mix(bg_color, color3, (1.0 - length(centered_uv * 0.5)) * 0.3);
+
+    // Star/Particle system
+    float stars = 0.0;
+    for (float i = 0.0; i < 40.0; i++) {
+        vec2 p = vec2(hash(vec2(i, 1.0)), hash(vec2(i, 2.0)));
+        
+        // Soft drift movement
+        p.y = fract(p.y - u_time * 0.02 * (hash(vec2(i, 3.0)) + 0.5));
+        p.x = fract(p.x + sin(u_time * 0.1 + i) * 0.02);
+
+        vec2 star_uv = (uv - p);
+        star_uv.x *= u_resolution.x / u_resolution.y;
+        
+        float dist = length(star_uv);
+        
+        // Star size and twinkling
+        float size = 0.002 + 0.003 * hash(vec2(i, 4.0));
+        float twinkle = sin(u_time * 2.0 + i * 10.0) * 0.5 + 0.5;
+        
+        // Soft glowing stars
+        stars += (size / dist) * twinkle * (0.8 + 0.2 * hash(vec2(i, 5.0)));
+    }
+
+    // Combine layers
+    vec3 final_color = bg_color + stars * vec3(1.0, 0.6, 1.0); // Pinkish-white stars
+
+    // Vignette
+    float vignette = 1.0 - length(centered_uv * 0.4);
+    final_color *= smoothstep(0.0, 0.8, vignette);
+
+    gl_FragColor = vec4(final_color, 1.0);
+}`;
+
+    function compileShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    }
+
+    const vert = compileShader(gl.VERTEX_SHADER, vs);
+    const frag = compileShader(gl.FRAGMENT_SHADER, fs);
+    if (!vert || !frag) return;
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vert);
+    gl.attachShader(prog, frag);
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
 
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1, -1,  1, -1,  -1, 1,
-      -1,  1,  1, -1,   1, 1,
-    ]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
-    let rafId;
-    function render(time) {
-      time *= 0.001;
-      const dw = canvas.clientWidth;
-      const dh = canvas.clientHeight;
-      if (canvas.width !== dw || canvas.height !== dh) {
-        canvas.width = dw;
-        canvas.height = dh;
+    const pos = gl.getAttribLocation(prog, 'a_position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uRes = gl.getUniformLocation(prog, 'u_resolution');
+    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+    let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+
+    const handleMouseMove = (event) => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width && rect.height) {
+        const nx = (event.clientX - rect.left) / rect.width;
+        const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+        mouse.x = nx * canvas.width;
+        mouse.y = ny * canvas.height;
       }
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-      gl.uniform2f(resLoc, gl.canvas.width, gl.canvas.height);
-      gl.uniform1f(timeLoc, time);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      rafId = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    let animationFrameId;
+    function render(t) {
+      syncSize();
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      if (uTime) gl.uniform1f(uTime, t * 0.001);
+      if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+      if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      animationFrameId = requestAnimationFrame(render);
     }
-    rafId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(rafId);
+
+    animationFrameId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (observer) observer.disconnect();
+      gl.deleteBuffer(buf);
+      gl.deleteProgram(prog);
+      gl.deleteShader(vert);
+      gl.deleteShader(frag);
+    };
   }, []);
 
   if (reducedMotion) {
-    return <div className="lp-static-bg-fallback" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #331a40 0%, #9470a6 50%, #73408c 100%)' }} />;
+    return <div className="lp-static-bg-fallback" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0d001a 0%, #33004d 100%)' }} />;
   }
 
-  return <canvas ref={canvasRef} className="lp-shader-canvas" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        display: 'block'
+      }}
+    />
+  );
 }
