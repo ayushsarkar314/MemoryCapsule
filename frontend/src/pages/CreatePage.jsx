@@ -329,7 +329,7 @@ const CreatePage = () => {
         
         {/* Page Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span className="lp-eyebrow" style={{ marginBottom: '12px' }}>Sanctum</span>
+        
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700, color: '#1d1b19', marginBottom: '8px' }}>
             Seal a Memory
           </h1>
@@ -854,12 +854,10 @@ const CreatePage = () => {
       {/* Success Animation Overlay */}
       {showSuccess && (
         <div className="success-overlay">
-          <div className="postman-sequence">
-            <div className="vault-jar-back"></div>
+          
             <div className="envelope-flying">💌</div>
-            <div className="vault-jar-front"></div>
-            <div className="vault-jar-lid"></div>
-          </div>
+           
+           
         </div>
       )}
     </div>

@@ -223,14 +223,10 @@ const GhostWallPage = () => {
 
           <header className="gw-header">
 
-            <div className="gw-eyebrow">
-              EPHEMERAL REALM
-            </div>
-
-            <h1 className="gw-title">
-              Ghost Wall
-            </h1>
-
+            
+ <h1 className="gw-title" style={{ color: "black" }}>
+  Ghost Wall
+</h1>
             <p className="gw-subtitle">
               Anonymous. Temporary. Honest.
             </p>
