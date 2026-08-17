@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { validateEmail } from '../utils/passwordValidation';
+import api from '../utils/api';
 import toast from 'react-hot-toast';
 import './LoginPage.css';
 
@@ -9,11 +11,13 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    identifier: '',
+    email: '',
     password: '',
   });
 
   const [loading, setLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [resending, setResending] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -25,20 +29,45 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.identifier || !form.password) {
+    if (!form.email.trim() || !form.password) {
       return toast.error('Please fill in all fields');
     }
 
+    if (!validateEmail(form.email)) {
+      return toast.error('Please enter a valid email address');
+    }
+
     setLoading(true);
+    setUnverifiedEmail('');
 
     try {
-      await login(form.identifier, form.password);
+      await login(form.email.trim(), form.password);
       toast.success('Welcome back ✨');
       navigate('/vault');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      const msg = err.response?.data?.message || 'Login failed';
+      toast.error(msg);
+      if (err.response?.data?.isUnverified) {
+        setUnverifiedEmail(err.response.data.email || form.email);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!unverifiedEmail) return;
+    setResending(true);
+    try {
+      const res = await api.post('/auth/resend-verification', { email: unverifiedEmail });
+      toast.success('Verification link resent! Check your inbox.');
+      if (res.data.verifyUrl) {
+        console.log('[Prototype Shortcut] Verify URL:', res.data.verifyUrl);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to resend verification link');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -49,28 +78,61 @@ const LoginPage = () => {
         {/* Logo / Brand */}
         <div className="login-header">
           <div className="login-logo">✦</div>
-
           <h1>Welcome back</h1>
-
           <p>Your memories are waiting for you.</p>
         </div>
 
+        {unverifiedEmail && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px 16px',
+            background: '#fff7ed',
+            border: '1px solid #ffedd5',
+            borderRadius: '12px',
+            fontSize: '0.85rem',
+            color: '#9a3412',
+          }}>
+            <p style={{ fontWeight: 600, marginBottom: '6px' }}>Email not verified yet</p>
+            <p style={{ marginBottom: '10px' }}>
+              Please click the link sent to <strong>{unverifiedEmail}</strong>.
+            </p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              style={{
+                background: '#ea580c',
+                color: '#ffffff',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {resending ? 'Sending...' : 'Resend Verification Email'}
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
 
-          {/* Email / Username */}
+          {/* Email Address */}
           <div className="login-form-group">
-            <label htmlFor="identifier">
-              Email or Username
+            <label htmlFor="email">
+              Email Address
             </label>
 
             <input
-              id="identifier"
-              name="identifier"
-              type="text"
-              placeholder="you@example.com or @username"
-              value={form.identifier}
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              value={form.email}
               onChange={handleChange}
-              autoComplete="username"
+              autoComplete="email"
+              required
             />
           </div>
 
@@ -94,6 +156,7 @@ const LoginPage = () => {
               value={form.password}
               onChange={handleChange}
               autoComplete="current-password"
+              required
             />
           </div>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { checkPasswordStrength } from '../utils/passwordValidation';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import './LoginPage.css';
@@ -14,6 +15,8 @@ const ResetPasswordPage = () => {
   const [showNew, setShowNew]     = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const passwordRules = checkPasswordStrength(form.newPassword);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -22,8 +25,8 @@ const ResetPasswordPage = () => {
     if (!form.newPassword || !form.confirmPassword) {
       return toast.error('Please fill in all fields');
     }
-    if (form.newPassword.length < 6) {
-      return toast.error('Password must be at least 6 characters');
+    if (!passwordRules.isStrong) {
+      return toast.error('Password must be at least 6 characters and include uppercase, lowercase, digit, and special character');
     }
     if (form.newPassword !== form.confirmPassword) {
       return toast.error('Passwords do not match');
@@ -34,8 +37,12 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
     try {
-      await api.post('/auth/reset-password', { token, newPassword: form.newPassword });
-      toast.success('Password reset! Please log in with your new password.');
+      const res = await api.post('/auth/reset-password', {
+        token,
+        newPassword: form.newPassword,
+        confirmPassword: form.confirmPassword,
+      });
+      toast.success(res.data.message || 'Password reset successfully. You can now log in with your new password.');
       navigate('/login');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Reset failed. The link may have expired.');
@@ -100,6 +107,36 @@ const ResetPasswordPage = () => {
                 {showNew ? '🙈' : '👁️'}
               </button>
             </div>
+
+            {/* Strength indicator */}
+            {form.newPassword && (
+              <div style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                background: 'rgba(255, 255, 255, 0.5)',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontFamily: 'Manrope, sans-serif',
+              }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                  <span style={{ color: passwordRules.minLength ? '#16a34a' : '#9ca3af' }}>
+                    {passwordRules.minLength ? '✓' : '○'} Min 6 characters
+                  </span>
+                  <span style={{ color: passwordRules.hasUpper ? '#16a34a' : '#9ca3af' }}>
+                    {passwordRules.hasUpper ? '✓' : '○'} Uppercase (A-Z)
+                  </span>
+                  <span style={{ color: passwordRules.hasLower ? '#16a34a' : '#9ca3af' }}>
+                    {passwordRules.hasLower ? '✓' : '○'} Lowercase (a-z)
+                  </span>
+                  <span style={{ color: passwordRules.hasNumber ? '#16a34a' : '#9ca3af' }}>
+                    {passwordRules.hasNumber ? '✓' : '○'} Number (0-9)
+                  </span>
+                  <span style={{ color: passwordRules.hasSpecial ? '#16a34a' : '#9ca3af', gridColumn: 'span 2' }}>
+                    {passwordRules.hasSpecial ? '✓' : '○'} Special character (!@#$...)
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Confirm Password */}

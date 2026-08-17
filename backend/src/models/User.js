@@ -69,7 +69,17 @@ const userSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
-    passwordResetExpires: {
+    // Email verification — true once user verifies via email link
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    emailVerificationExpires: {
       type: Date,
       default: null,
       select: false,

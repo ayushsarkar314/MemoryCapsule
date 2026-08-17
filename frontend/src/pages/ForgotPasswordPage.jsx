@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { validateEmail } from '../utils/passwordValidation';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import './LoginPage.css';
@@ -12,6 +13,10 @@ const ForgotPasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email.trim()) return toast.error('Please enter your email address');
+
+    if (!validateEmail(email)) {
+      return toast.error('Please enter a valid email address');
+    }
 
     setLoading(true);
     try {
@@ -31,7 +36,7 @@ const ForgotPasswordPage = () => {
         <div className="login-header">
           <div className="login-logo">✦</div>
           <h1>Forgot Password</h1>
-          <p>Enter your email and we'll send you a reset link</p>
+          <p>Enter your registered email and we'll send you a reset link</p>
         </div>
 
         {submitted ? (
@@ -57,7 +62,7 @@ const ForgotPasswordPage = () => {
           /* Form state */
           <form onSubmit={handleSubmit}>
             <div className="login-form-group">
-              <label htmlFor="forgot-email">Email Address</label>
+              <label htmlFor="forgot-email">Registered Email Address</label>
               <input
                 id="forgot-email"
                 name="email"
@@ -67,6 +72,7 @@ const ForgotPasswordPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 autoFocus
+                required
               />
             </div>
 
